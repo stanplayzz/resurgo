@@ -1,0 +1,10 @@
+#pragma once
+#include <clib/version_string.hpp>
+
+namespace resurgo {
+inline constexpr auto buildVersion_v = clib::Version {
+	.major = @PROJECT_VERSION_MAJOR@, .minor = @PROJECT_VERSION_MINOR@, .patch = @PROJECT_VERSION_PATCH@
+};
+
+inline auto const buildVersionStr_v = std::format("{}", buildVersion_v);
+} // namespace resurgo
