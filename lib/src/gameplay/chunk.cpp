@@ -20,7 +20,7 @@ void Chunk::generate(ChunkData const& data) {
 				auto pos2 = sf::Vector2f{(fx + 1) * tileSize_v, (fy + 1) * tileSize_v};
 				auto pos3 = sf::Vector2f{fx * tileSize_v, (fy + 1) * tileSize_v};
 
-				auto rect = getTileRectFromId(layer.tiles.at(x + (y * chunkSize_v)));
+				auto rect = getTileRectFromId(static_cast<std::size_t>(layer.tiles.at(x + (y * chunkSize_v))));
 				auto tex0 = sf::Vector2f{rect.position.x, rect.position.y};
 				auto tex1 = sf::Vector2f{rect.position.x + rect.size.x, rect.position.y};
 				auto tex2 = sf::Vector2f{rect.position.x + rect.size.x, rect.position.y + rect.size.y};

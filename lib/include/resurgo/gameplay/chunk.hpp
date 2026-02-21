@@ -1,11 +1,12 @@
 #pragma once
+#include "resurgo/gameplay/tile.hpp"
 #include <SFML/Graphics.hpp>
 
 namespace resurgo {
 constexpr auto chunkSize_v = 8;
 
 struct Layer {
-	std::array<std::size_t, chunkSize_v * chunkSize_v> tiles{};
+	std::array<Tile, chunkSize_v * chunkSize_v> tiles{};
 	sf::VertexArray vertices{};
 };
 

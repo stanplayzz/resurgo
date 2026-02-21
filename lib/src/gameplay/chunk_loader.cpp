@@ -1,12 +1,14 @@
 #include "resurgo/gameplay/chunk_loader.hpp"
-#include "resurgo/gameplay/tile.hpp"
 #include <cmath>
 #include <print>
 
 namespace resurgo {
 namespace {
-constexpr auto renderDistance_v = 4;
-}
+constexpr auto renderDistance_v = 5;
+
+constexpr auto noiseScale_v = 0.02f;
+constexpr auto noiseOctaves_v = 3;
+} // namespace
 
 void ChunkLoader::update(sf::View const& view) {
 	auto centerChunk = sf::Vector2i{static_cast<int>(std::floor(view.getCenter().x / (chunkSize_v * tileSize_v))),
@@ -21,6 +23,16 @@ void ChunkLoader::update(sf::View const& view) {
 	std::println("{}", m_chunks.size());
 }
 
+auto ChunkLoader::getTileAt(sf::Vector2f coords) const -> Tile {
+	auto scaled = coords * noiseScale_v;
+	auto noise = m_noise.octave2D_01(scaled.x, scaled.y, noiseOctaves_v);
+
+	auto tile = Tile{};
+	if (noise < 0.3f) { tile = Tile::LowSoil; }
+	if (noise > 0.7f) { tile = Tile::Rock; }
+	return tile;
+}
+
 void ChunkLoader::loadChunks(sf::Vector2i centerChunk) {
 	for (auto y = -renderDistance_v; y <= renderDistance_v; y++) {
 		for (auto x = -renderDistance_v; x <= renderDistance_v; x++) {
@@ -28,9 +40,16 @@ void ChunkLoader::loadChunks(sf::Vector2i centerChunk) {
 
 			if (!m_chunks.contains(coord)) {
 				auto chunk = Chunk{};
-
 				auto data = ChunkData{};
-				data.layers.push_back(Layer{.tiles = std::array<std::size_t, chunkSize_v * chunkSize_v>{1, 0, 0, 0}});
+				auto layer = Layer{};
+
+				for (auto i = 0; i < chunkSize_v * chunkSize_v; i++) {
+					auto tilePosition = sf::Vector2i{(coord.x * chunkSize_v) + (i % chunkSize_v),
+													 (coord.y * chunkSize_v) + (i / chunkSize_v)};
+					layer.tiles.at(static_cast<std::size_t>(i)) = getTileAt({tilePosition});
+				}
+
+				data.layers.push_back(layer);
 
 				chunk.generate(data);
 				chunk.setPosition(coord);

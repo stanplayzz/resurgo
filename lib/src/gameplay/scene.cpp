@@ -29,6 +29,7 @@ void Scene::draw(sf::RenderTarget& target) const {
 }
 
 void Scene::handleInput(sf::Event const& event) {
+	auto const& window = m_app->window();
 	if (auto const* resized = event.getIf<sf::Event::Resized>()) { m_view.setSize({resized->size}); }
 
 	if (auto const* mouse = event.getIf<sf::Event::MouseButtonPressed>()) {
@@ -36,6 +37,16 @@ void Scene::handleInput(sf::Event const& event) {
 			m_panningPosition = mouse->position;
 			m_panning = true;
 		}
+	}
+
+	if (auto const* mouse = event.getIf<sf::Event::MouseWheelScrolled>()) {
+		auto step = (mouse->delta > 0) ? 0.9f : 1.1f;
+		auto newZoom = zoomLevel * step;
+
+		newZoom = std::clamp(newZoom, 0.1f, 2.f);
+		zoomLevel = newZoom;
+
+		m_view.setSize(window.getDefaultView().getSize() * newZoom);
 	}
 
 	if (event.is<sf::Event::MouseButtonReleased>()) { m_panning = false; }

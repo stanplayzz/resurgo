@@ -1,5 +1,7 @@
 #pragma once
 #include "resurgo/gameplay/chunk.hpp"
+#include "resurgo/gameplay/tile.hpp"
+#include "resurgo/utils/perlin_noise.hpp"
 #include <clib/not_null.hpp>
 
 namespace resurgo {
@@ -18,11 +20,14 @@ class ChunkLoader {
 	void draw(sf::RenderTarget& target) const;
 
   private:
+	auto getTileAt(sf::Vector2f coords) const -> Tile;
+
 	void loadChunks(sf::Vector2i centerChunk);
 	void unloadChunks(sf::Vector2i centerChunk);
 
 	std::unordered_map<sf::Vector2i, Chunk, ChunkHash> m_chunks{};
-
 	sf::Vector2i m_lastCenterChunk{};
+
+	siv::PerlinNoise m_noise{12345u};
 };
 } // namespace resurgo

@@ -17,8 +17,10 @@ class Scene {
 
 	sf::View m_view{};
 
+	// view transformations
 	sf::Vector2i m_panningPosition{};
 	bool m_panning{};
+	float zoomLevel{1.f};
 
 	World m_world{};
 };
