@@ -1,28 +1,34 @@
 #pragma once
 #include "resurgo/animations/wave_text.hpp"
+#include "resurgo/resources.hpp"
 #include "resurgo/state_manager.hpp"
 #include <SFML/Graphics/Font.hpp>
 #include <SFML/Graphics/Sprite.hpp>
 #include <SFML/Graphics/Texture.hpp>
+#include <memory>
 #include <optional>
 
 namespace resurgo::state {
 class Entrypoint : public State {
   public:
-	explicit Entrypoint();
+	explicit Entrypoint(clib::not_null<App const*> app);
 
 	// functions inherited from State
-	void update(sf::Time time) override;
+	auto update(sf::Time deltaTime) -> std::unique_ptr<State> override;
 	void draw(sf::RenderTarget& target) const override;
-	[[nodiscard]] auto clearColor() const -> sf::Color override {
-		return sf::Color::Blue;
-	}
+	void handleInput(sf::Event const& event) override;
 
   private:
-	sf::Texture m_backgroundTexture{};
-	sf::Sprite m_background{m_backgroundTexture};
+	clib::not_null<App const*> m_app;
+
+	sf::Sprite m_background{*Resources::instance().load<sf::Texture>("images/entrypoint_background.png")};
+	sf::Sprite m_planet{*Resources::instance().load<sf::Texture>("images/entrypoint_planet.png")};
+
+	sf::Text m_playText{*Resources::instance().load<sf::Font>("fonts/exo2.ttf")};
+	sf::Vector2f m_playTextPosition{50.f, 200.f};
 
 	std::optional<animation::WaveText> m_titleText{};
-	sf::Font m_titleFont{};
+
+	std::unique_ptr<State> targetState{};
 };
 } // namespace resurgo::state

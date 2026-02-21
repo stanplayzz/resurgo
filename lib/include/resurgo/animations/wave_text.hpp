@@ -8,7 +8,7 @@ class WaveText : public Animation {
   public:
 	explicit WaveText(sf::Font const& font, std::string const& str, unsigned charSize);
 
-	void update(sf::Time time) override;
+	void update(sf::Time deltaTime) override;
 	void draw(sf::RenderTarget& target) const override;
 
 	void setPosition(sf::Vector2f position) override {
@@ -23,5 +23,6 @@ class WaveText : public Animation {
   private:
 	std::vector<sf::Text> m_letters{};
 	sf::Vector2f m_position{};
+	sf::Time m_elapsed{};
 };
 } // namespace resurgo::animation

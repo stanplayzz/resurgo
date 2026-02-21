@@ -23,9 +23,10 @@ WaveText::WaveText(sf::Font const& font, std::string const& str, unsigned const 
 	}
 }
 
-void WaveText::update(sf::Time time) {
+void WaveText::update(sf::Time deltaTime) {
+	m_elapsed += deltaTime;
 	for (std::size_t i = 0; i < m_letters.size(); i++) {
-		auto delta = std::sin((time.asSeconds() * speed_v) + (static_cast<float>(i) * 0.4f)) * reach_v;
+		auto delta = std::sin((m_elapsed.asSeconds() * speed_v) + (static_cast<float>(i) * 0.4f)) * reach_v;
 
 		auto pos = sf::Vector2f{m_letters[i].getPosition().x, m_position.y + delta};
 		m_letters[i].setPosition(pos);

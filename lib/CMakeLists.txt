@@ -11,7 +11,7 @@ target_compile_features(${PROJECT_NAME} PUBLIC
   cxx_std_23
 )
 
-target_compile_definitions(${PROJECT_NAME} PUBLIC ASSETS_DIR="${CMAKE_SOURCE_DIR}/assets")
+target_compile_definitions(${PROJECT_NAME} PUBLIC ASSETS_DIR="${CMAKE_SOURCE_DIR}/assets/")
 
 set(version_header "${CMAKE_CURRENT_BINARY_DIR}/include/${package_name}/build_version.hpp")
 configure_file(src/build_version.hpp.in "${version_header}" @ONLY)

@@ -6,8 +6,11 @@ namespace resurgo {
 class App {
   public:
 	explicit App();
-
 	void run();
+
+	[[nodiscard]] auto window() const -> sf::RenderWindow const& {
+		return m_window;
+	}
 
   private:
 	sf::RenderWindow m_window{};

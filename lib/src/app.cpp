@@ -7,19 +7,21 @@
 namespace resurgo {
 App::App() {
 	m_window.create(sf::VideoMode{{1280, 720}}, std::format("Resurgo {}", buildVersionStr_v));
+	m_window.setVerticalSyncEnabled(true);
 
-	m_stateManager.setState(std::make_unique<state::Entrypoint>());
+	m_stateManager.setState(std::make_unique<state::Entrypoint>(this));
 }
 
 void App::run() {
-	sf::Clock m_clock{};
+	auto clock = sf::Clock{};
 
 	while (m_window.isOpen()) {
 		while (auto const event = m_window.pollEvent()) {
 			if (event->is<sf::Event::Closed>()) { m_window.close(); }
+			m_stateManager.handleInput(*event);
 		}
 
-		auto deltaTime = m_clock.getElapsedTime();
+		auto deltaTime = clock.restart();
 
 		m_stateManager.update(deltaTime);
 
