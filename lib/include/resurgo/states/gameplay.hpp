@@ -1,4 +1,5 @@
 #pragma once
+#include "resurgo/gameplay/scene.hpp"
 #include "resurgo/state_manager.hpp"
 #include <memory>
 
@@ -13,5 +14,6 @@ class Gameplay : public State {
 
   private:
 	clib::not_null<App const*> m_app;
+	Scene m_scene;
 };
 } // namespace resurgo::state
