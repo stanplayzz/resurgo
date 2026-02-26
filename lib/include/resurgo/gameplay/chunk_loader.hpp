@@ -19,6 +19,8 @@ class ChunkLoader {
 	void update(sf::View const& view);
 	void draw(sf::RenderTarget& target) const;
 
+	auto getChunkAt(sf::Vector2i coord) -> Chunk& { return m_chunks.find(coord)->second; }
+
   private:
 	auto getTileAt(sf::Vector2f coords) const -> Tile;
 

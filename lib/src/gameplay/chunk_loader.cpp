@@ -1,6 +1,5 @@
 #include "resurgo/gameplay/chunk_loader.hpp"
 #include <cmath>
-#include <print>
 
 namespace resurgo {
 namespace {
@@ -19,8 +18,6 @@ void ChunkLoader::update(sf::View const& view) {
 		loadChunks(centerChunk);
 		unloadChunks(centerChunk);
 	}
-
-	std::println("{}", m_chunks.size());
 }
 
 auto ChunkLoader::getTileAt(sf::Vector2f coords) const -> Tile {

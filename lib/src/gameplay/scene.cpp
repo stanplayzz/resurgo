@@ -6,8 +6,12 @@ namespace resurgo {
 Scene::Scene(clib::not_null<App const*> app) : m_app(app) {
 	// pre load assets
 	Resources::instance().load<sf::Texture>("images/tileset.png");
+	Resources::instance().load<sf::Texture>("images/entities.png");
 
 	m_view = sf::View(sf::FloatRect{{}, sf::Vector2f{app->window().getSize()}});
+	m_storage.load();
+
+	m_materialsUI.emplace(&m_storage, sf::Vector2f{m_app->window().getSize()});
 }
 
 auto Scene::update(sf::Time /*deltaTime*/) -> std::unique_ptr<State> {
@@ -20,12 +24,18 @@ auto Scene::update(sf::Time /*deltaTime*/) -> std::unique_ptr<State> {
 
 	m_world.update(m_view);
 
+	m_materialsUI->update();
+
 	return nullptr;
 }
 
 void Scene::draw(sf::RenderTarget& target) const {
 	target.setView(m_view);
 	m_world.draw(target);
+
+	target.setView(target.getDefaultView());
+	m_materialsUI->draw(target, {});
+	target.setView(m_view);
 }
 
 void Scene::handleInput(sf::Event const& event) {
@@ -50,5 +60,11 @@ void Scene::handleInput(sf::Event const& event) {
 	}
 
 	if (event.is<sf::Event::MouseButtonReleased>()) { m_panning = false; }
+
+	// TESTING
+	if (auto const* key = event.getIf<sf::Event::KeyPressed>()) {
+		if (key->scancode == sf::Keyboard::Scancode::S) { m_storage.save(); }
+		if (key->scancode == sf::Keyboard::Scancode::A) { m_storage.add(Item::Iron); }
+	}
 }
 } // namespace resurgo

@@ -1,4 +1,5 @@
 #pragma once
+#include "resurgo/gameplay/entity.hpp"
 #include "resurgo/gameplay/tile.hpp"
 #include <SFML/Graphics.hpp>
 
@@ -19,6 +20,18 @@ class Chunk : public sf::Drawable {
   public:
 	void generate(ChunkData const& data);
 
+	template <typename T>
+	void addEntityAt(sf::Vector2i chunkPosition = {}) {
+		m_entities.push_back(std::make_unique<T>());
+		m_entities.back()->setPosition(chunkPosition);
+	}
+
+	void removeEntityAt(sf::Vector2i chunkPosition) {
+		std::erase_if(m_entities, [&](auto const& e) {
+			return e->getPosition() == chunkPosition;
+		});
+	}
+
 	[[nodiscard]] auto position() const -> sf::Vector2i { return m_position; }
 	void setPosition(sf::Vector2i position) { m_position = position; }
 
@@ -27,5 +40,6 @@ class Chunk : public sf::Drawable {
   private:
 	sf::Vector2i m_position{};
 	std::vector<Layer> m_layers{};
+	std::vector<std::unique_ptr<Entity>> m_entities{};
 };
 } // namespace resurgo

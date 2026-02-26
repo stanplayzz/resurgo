@@ -1,4 +1,6 @@
 #pragma once
+#include "resurgo/gameplay/UI/materials.hpp"
+#include "resurgo/gameplay/storage.hpp"
 #include "resurgo/gameplay/world.hpp"
 #include "resurgo/state_manager.hpp"
 #include <SFML/Graphics.hpp>
@@ -23,5 +25,9 @@ class Scene {
 	float zoomLevel{1.f};
 
 	World m_world{};
+	Storage m_storage{};
+
+	// UI Components
+	std::optional<ui::Materials> m_materialsUI{};
 };
 } // namespace resurgo

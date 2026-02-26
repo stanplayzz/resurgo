@@ -52,5 +52,10 @@ void Chunk::draw(sf::RenderTarget& target, sf::RenderStates states) const {
 	states.transform.translate({m_position * chunkSize_v * tileSize_v});
 
 	for (auto const& layer : m_layers) { target.draw(layer.vertices, states); }
+	for (auto const& entity : m_entities) {
+		auto entityStates = states;
+		entityStates.transform.translate({entity->getPosition() * tileSize_v});
+		target.draw(*entity, entityStates);
+	}
 }
 } // namespace resurgo
