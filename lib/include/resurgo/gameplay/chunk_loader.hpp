@@ -1,6 +1,5 @@
 #pragma once
 #include "resurgo/gameplay/chunk.hpp"
-#include "resurgo/gameplay/tile.hpp"
 #include "resurgo/utils/perlin_noise.hpp"
 #include <clib/not_null.hpp>
 
@@ -22,10 +21,9 @@ class ChunkLoader {
 	auto getChunkAt(sf::Vector2i coord) -> Chunk& { return m_chunks.find(coord)->second; }
 
   private:
-	auto getTileAt(sf::Vector2f coords) const -> Tile;
-
 	void loadChunks(sf::Vector2i centerChunk);
 	void unloadChunks(sf::Vector2i centerChunk);
+	void computeChunkFaces();
 
 	std::unordered_map<sf::Vector2i, Chunk, ChunkHash> m_chunks{};
 	sf::Vector2i m_lastCenterChunk{};

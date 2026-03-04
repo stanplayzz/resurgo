@@ -3,31 +3,27 @@
 
 namespace resurgo {
 namespace {
-constexpr auto renderDistance_v = 5;
-
-constexpr auto noiseScale_v = 0.02f;
-constexpr auto noiseOctaves_v = 3;
+constexpr auto renderDistance_v = 4;
 } // namespace
 
 void ChunkLoader::update(sf::View const& view) {
-	auto centerChunk = sf::Vector2i{static_cast<int>(std::floor(view.getCenter().x / (chunkSize_v * tileSize_v))),
-									static_cast<int>(std::floor(view.getCenter().y / (chunkSize_v * tileSize_v)))};
+	auto center = view.getCenter();
+
+	// make sure to match isometric chunk generation
+	auto x = (center.x / (tileSize_v * 0.5f) + center.y / (tileSize_v * 0.25f)) * 0.5f;
+	auto y = (center.y / (tileSize_v * 0.25f) - center.x / (tileSize_v * 0.5f)) * 0.5f;
+
+	auto centerChunk = sf::Vector2i{
+		static_cast<int>(std::floor(x / chunkSize_v)),
+		static_cast<int>(std::floor(y / chunkSize_v)),
+	};
 
 	if (centerChunk != m_lastCenterChunk) {
 		m_lastCenterChunk = centerChunk;
 		loadChunks(centerChunk);
 		unloadChunks(centerChunk);
+		computeChunkFaces();
 	}
-}
-
-auto ChunkLoader::getTileAt(sf::Vector2f coords) const -> Tile {
-	auto scaled = coords * noiseScale_v;
-	auto noise = m_noise.octave2D_01(scaled.x, scaled.y, noiseOctaves_v);
-
-	auto tile = Tile{};
-	if (noise < 0.3f) { tile = Tile::LowSoil; }
-	if (noise > 0.7f) { tile = Tile::Rock; }
-	return tile;
 }
 
 void ChunkLoader::loadChunks(sf::Vector2i centerChunk) {
@@ -37,19 +33,9 @@ void ChunkLoader::loadChunks(sf::Vector2i centerChunk) {
 
 			if (!m_chunks.contains(coord)) {
 				auto chunk = Chunk{};
-				auto data = ChunkData{};
-				auto layer = Layer{};
 
-				for (auto i = 0; i < chunkSize_v * chunkSize_v; i++) {
-					auto tilePosition = sf::Vector2i{(coord.x * chunkSize_v) + (i % chunkSize_v),
-													 (coord.y * chunkSize_v) + (i / chunkSize_v)};
-					layer.tiles.at(static_cast<std::size_t>(i)) = getTileAt({tilePosition});
-				}
-
-				data.layers.push_back(layer);
-
-				chunk.generate(data);
 				chunk.setPosition(coord);
+				chunk.generate(m_noise);
 
 				m_chunks.emplace(coord, std::move(chunk));
 			}
@@ -70,7 +56,22 @@ void ChunkLoader::unloadChunks(sf::Vector2i centerChunk) {
 	}
 }
 
+void ChunkLoader::computeChunkFaces() {
+	for (auto& [coord, chunk] : m_chunks) {
+		chunk.computeFaces([&](sf::Vector2i neighbour) -> Chunk* {
+			auto it = m_chunks.find(neighbour);
+			return it != m_chunks.end() ? &it->second : nullptr;
+		});
+	}
+}
+
 void ChunkLoader::draw(sf::RenderTarget& target) const {
-	for (auto const& chunk : m_chunks) { chunk.second.draw(target); }
+	auto sorted = std::vector<Chunk const*>{};
+	sorted.reserve(m_chunks.size());
+	for (auto const& [coord, chunk] : m_chunks) { sorted.push_back(&chunk); }
+	std::ranges::sort(sorted, [](Chunk const* a, Chunk const* b) {
+		return (a->position().x + a->position().y) < (b->position().x + b->position().y);
+	});
+	for (auto const* chunk : sorted) { chunk->draw(target); }
 }
 } // namespace resurgo

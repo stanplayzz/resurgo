@@ -3,22 +3,28 @@
 #include <cstddef>
 
 namespace resurgo {
-constexpr auto tileTextureOffset_v = 16;
-constexpr auto tileSize_v = 32;
+constexpr auto tileTextureOffset_v = 512;
+constexpr auto tileSize_v = 128;
 
-enum class Tile : std::int8_t {
+enum class TileId : std::int8_t {
 	Soil = 0,
-	Rock = 1,
-	LowSoil = 2,
+	DarkSoil = 1,
 };
 
-constexpr auto getTileRectFromId(std::size_t id) {
+struct Tile {
+	TileId id{};
+	sf::Vector3i position{};
+	int leftFaceHeight{};
+	int rightFaceHeight{};
+};
+
+inline auto getTileRectFromId(std::size_t id) {
 	auto const& tileset = *Resources::instance().load<sf::Texture>("images/tileset.png");
 	auto texuresPerRow = tileset.getSize().x / tileTextureOffset_v;
-	auto row = id % texuresPerRow;
-	auto col = id / texuresPerRow;
+	auto row = id / texuresPerRow;
+	auto col = id % texuresPerRow;
 
-	return sf::FloatRect{{static_cast<float>(row * tileTextureOffset_v), static_cast<float>(col * tileTextureOffset_v)},
+	return sf::FloatRect{{static_cast<float>(col * tileTextureOffset_v), static_cast<float>(row * tileTextureOffset_v)},
 						 {tileTextureOffset_v, tileTextureOffset_v}};
 }
 } // namespace resurgo
