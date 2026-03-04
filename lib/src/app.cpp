@@ -6,7 +6,11 @@
 
 namespace resurgo {
 App::App() {
-	m_window.create(sf::VideoMode{{1280, 720}}, std::format("Resurgo {}", buildVersionStr_v));
+	auto settings = sf::ContextSettings{};
+	settings.antiAliasingLevel = 8;
+
+	m_window.create(sf::VideoMode{{1280, 720}}, std::format("Resurgo {}", buildVersionStr_v), sf::Style::Default,
+					sf::State::Windowed, settings);
 	m_window.setVerticalSyncEnabled(true);
 
 	m_stateManager.setState(std::make_unique<state::Entrypoint>(this));

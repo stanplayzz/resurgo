@@ -5,8 +5,7 @@
 namespace resurgo {
 Scene::Scene(clib::not_null<App const*> app) : m_app(app) {
 	// pre load assets
-	Resources::instance().load<sf::Texture>("images/tileset.png");
-	Resources::instance().load<sf::Texture>("images/entities.png");
+	Resources::instance().load<sf::Texture>("images/tileset.png")->setSmooth(true);
 
 	m_view = sf::View(sf::FloatRect{{}, sf::Vector2f{app->window().getSize()}});
 	m_storage.load();

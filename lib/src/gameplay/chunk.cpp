@@ -59,10 +59,11 @@ void Chunk::computeFaces(std::function<Chunk*(sf::Vector2i)> const& getNeighbour
 void Chunk::createQuad(sf::Vector2f p1, sf::Vector2f p2, sf::Vector2f p3, sf::Vector2f p4, sf::FloatRect rect,
 					   sf::Color color) {
 
-	auto texTop = sf::Vector2f{rect.position.x, rect.position.y};
-	auto texRight = sf::Vector2f{rect.position.x + rect.size.x, rect.position.y};
-	auto texBottom = sf::Vector2f{rect.position.x + rect.size.x, rect.position.y + rect.size.y};
-	auto texLeft = sf::Vector2f{rect.position.x, rect.position.y + rect.size.y};
+	constexpr auto pad = 2.f;
+	auto texTop = sf::Vector2f{rect.position.x + pad, rect.position.y + pad};
+	auto texRight = sf::Vector2f{rect.position.x + rect.size.x - pad, rect.position.y + pad};
+	auto texBottom = sf::Vector2f{rect.position.x + rect.size.x - pad, rect.position.y + rect.size.y - pad};
+	auto texLeft = sf::Vector2f{rect.position.x + pad, rect.position.y + rect.size.y - pad};
 
 	m_vertexArray.append({.position = p1, .color = color, .texCoords = texTop});
 	m_vertexArray.append({.position = p2, .color = color, .texCoords = texRight});
