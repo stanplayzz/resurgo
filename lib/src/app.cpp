@@ -7,7 +7,7 @@
 namespace resurgo {
 App::App() {
 	auto settings = sf::ContextSettings{};
-	settings.antiAliasingLevel = 8;
+	// settings.antiAliasingLevel = 8;
 
 	m_window.create(sf::VideoMode{{1280, 720}}, std::format("Resurgo {}", buildVersionStr_v), sf::Style::Default,
 					sf::State::Windowed, settings);

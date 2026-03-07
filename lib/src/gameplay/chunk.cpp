@@ -5,6 +5,8 @@ namespace resurgo {
 namespace {
 constexpr auto maxHeight_v = 20;
 constexpr auto sideFaceHeight_v = tileSize_v * 0.25f;
+constexpr auto rightShadow_v = sf::Color{180, 180, 180};
+constexpr auto leftShadow_v = sf::Color{100, 100, 100};
 } // namespace
 
 void Chunk::generate(siv::PerlinNoise noise) {
@@ -59,11 +61,10 @@ void Chunk::computeFaces(std::function<Chunk*(sf::Vector2i)> const& getNeighbour
 void Chunk::createQuad(sf::Vector2f p1, sf::Vector2f p2, sf::Vector2f p3, sf::Vector2f p4, sf::FloatRect rect,
 					   sf::Color color) {
 
-	constexpr auto pad = 2.f;
-	auto texTop = sf::Vector2f{rect.position.x + pad, rect.position.y + pad};
-	auto texRight = sf::Vector2f{rect.position.x + rect.size.x - pad, rect.position.y + pad};
-	auto texBottom = sf::Vector2f{rect.position.x + rect.size.x - pad, rect.position.y + rect.size.y - pad};
-	auto texLeft = sf::Vector2f{rect.position.x + pad, rect.position.y + rect.size.y - pad};
+	auto texTop = sf::Vector2f{rect.position.x, rect.position.y};
+	auto texRight = sf::Vector2f{rect.position.x + rect.size.x, rect.position.y};
+	auto texBottom = sf::Vector2f{rect.position.x + rect.size.x, rect.position.y + rect.size.y};
+	auto texLeft = sf::Vector2f{rect.position.x, rect.position.y + rect.size.y};
 
 	m_vertexArray.append({.position = p1, .color = color, .texCoords = texTop});
 	m_vertexArray.append({.position = p2, .color = color, .texCoords = texRight});
@@ -86,7 +87,10 @@ void Chunk::generateSideFaces(Tile const& tile) {
 		auto sb1 = sf::Vector2f{st1.x, st1.y + sideH};
 		auto sb2 = sf::Vector2f{st2.x, st2.y + sideH};
 
-		createQuad(st1, st2, sb1, sb2, getTileRectFromId(1));
+		auto rect = getTileRectFromId(0);
+		rect.size.y = rect.size.y * 0.5f * static_cast<float>(tile.rightFaceHeight);
+
+		createQuad(st1, st2, sb1, sb2, rect, rightShadow_v);
 	}
 
 	if (tile.leftFaceHeight > 0) {
@@ -97,9 +101,10 @@ void Chunk::generateSideFaces(Tile const& tile) {
 		auto sb1 = sf::Vector2f{st1.x, st1.y + sideH};
 		auto sb2 = sf::Vector2f{st2.x, st2.y + sideH};
 
-		auto shade = sf::Color{180, 180, 180};
+		auto rect = getTileRectFromId(0);
+		rect.size.y = rect.size.y * 0.5f * static_cast<float>(tile.leftFaceHeight);
 
-		createQuad(st1, st2, sb1, sb2, getTileRectFromId(1), shade);
+		createQuad(st1, st2, sb1, sb2, rect, leftShadow_v);
 	}
 }
 
