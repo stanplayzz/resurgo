@@ -1,4 +1,5 @@
 #include "resurgo/gameplay/chunk.hpp"
+#include "resurgo/gameplay/iso_transform.hpp"
 #include <algorithm>
 
 namespace resurgo {
@@ -10,6 +11,7 @@ constexpr auto leftShadow_v = sf::Color{100, 100, 100};
 } // namespace
 
 void Chunk::generate(siv::PerlinNoise noise) {
+
 	m_tiles.resize(chunkSize_v * chunkSize_v);
 	for (std::size_t y = 0; y < chunkSize_v; y++) {
 		for (std::size_t x = 0; x < chunkSize_v; x++) {
@@ -75,8 +77,9 @@ void Chunk::createQuad(sf::Vector2f p1, sf::Vector2f p2, sf::Vector2f p3, sf::Ve
 }
 
 void Chunk::generateSideFaces(Tile const& tile) {
-	auto x = static_cast<float>(tile.position.x - tile.position.y) * (tileSize_v * 0.5f);
-	auto y = static_cast<float>(tile.position.x + tile.position.y) * (tileSize_v * 0.25f);
+	auto pos = IsoTransform::tileToScreen({tile.position.x, tile.position.y});
+	auto x = pos.x;
+	auto y = pos.y;
 	auto z = static_cast<float>(tile.position.z) * sideFaceHeight_v;
 
 	if (tile.rightFaceHeight > 0) {
@@ -121,8 +124,9 @@ void Chunk::generateVertexArray() {
 	for (auto const& tile : sorted) {
 		generateSideFaces(tile);
 
-		auto x = static_cast<float>(tile.position.x - tile.position.y) * (tileSize_v * 0.5f);
-		auto y = static_cast<float>(tile.position.x + tile.position.y) * (tileSize_v * 0.25f);
+		auto pos = IsoTransform::tileToScreen({tile.position.x, tile.position.y});
+		auto x = pos.x;
+		auto y = pos.y;
 		auto z = static_cast<float>(tile.position.z) * sideFaceHeight_v;
 
 		// vertices
@@ -139,4 +143,42 @@ void Chunk::draw(sf::RenderTarget& target, sf::RenderStates states) const {
 	states.texture = Resources::instance().get<sf::Texture>("images/tileset.png").get();
 	target.draw(m_vertexArray, states);
 }
+
+void Chunk::drawChunkBorders(sf::RenderTarget& target) const {
+	auto line = [&](sf::Vector2f a, sf::Vector2f b, sf::Color color = sf::Color::Red) {
+		auto verts = std::array{sf::Vertex{.position = a, .color = color}, sf::Vertex{.position = b, .color = color}};
+		target.draw(verts.data(), 2, sf::PrimitiveType::Lines);
+	};
+
+	auto tileCorners = [](sf::Vector2f pos, float z) {
+		struct {
+			sf::Vector2f top, right, bottom, left;
+		} c;
+		c.top = {pos.x + (tileSize_v * 0.5f), pos.y - z};
+		c.right = {pos.x + tileSize_v, pos.y + (tileSize_v * 0.25f) - z};
+		c.bottom = {pos.x + (tileSize_v * 0.5f), pos.y + (tileSize_v * 0.5f) - z};
+		c.left = {pos.x, pos.y + (tileSize_v * 0.25f) - z};
+		return c;
+	};
+
+	auto corners = [&](std::size_t index) {
+		auto const& tile = m_tiles.at(index);
+		auto pos = IsoTransform::tileToScreen({tile.position.x, tile.position.y});
+		auto z = static_cast<float>(tile.position.z) * (tileSize_v * 0.25f);
+		return tileCorners(pos, z);
+	};
+
+	for (std::size_t i = 0; i < chunkSize_v; i++) {
+		auto tr = corners(i);
+		auto tl = corners(i * chunkSize_v);
+		auto br = corners((i * chunkSize_v) + (chunkSize_v - 1));
+		auto bl = corners(((chunkSize_v - 1) * chunkSize_v) + i);
+
+		line(tr.top, tr.right);
+		line(tl.top, tl.left);
+		line(br.right, br.bottom);
+		line(bl.left, bl.bottom);
+	}
+}
+
 } // namespace resurgo

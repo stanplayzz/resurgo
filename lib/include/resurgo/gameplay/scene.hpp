@@ -1,5 +1,7 @@
 #pragma once
 #include "resurgo/gameplay/UI/materials.hpp"
+#include "resurgo/gameplay/player.hpp"
+#include "resurgo/gameplay/settings.hpp"
 #include "resurgo/gameplay/storage.hpp"
 #include "resurgo/gameplay/world.hpp"
 #include "resurgo/state_manager.hpp"
@@ -19,6 +21,8 @@ class Scene {
 
 	sf::View m_view{};
 
+	Settings m_settings{};
+
 	// view transformations
 	sf::Vector2i m_panningPosition{};
 	bool m_panning{};
@@ -26,6 +30,8 @@ class Scene {
 
 	World m_world{};
 	Storage m_storage{};
+
+	Player m_player{};
 
 	// UI Components
 	std::optional<ui::Materials> m_materialsUI{};

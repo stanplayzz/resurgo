@@ -1,4 +1,4 @@
-#include "resurgo/gameplay/chunk_loader.hpp"
+#include "resurgo/gameplay/chunk_manager.hpp"
 #include <cmath>
 
 namespace resurgo {
@@ -6,7 +6,7 @@ namespace {
 constexpr auto renderDistance_v = 4;
 } // namespace
 
-void ChunkLoader::update(sf::View const& view) {
+void ChunkManager::update(sf::View const& view) {
 	auto center = view.getCenter();
 
 	// make sure to match isometric chunk generation
@@ -26,7 +26,7 @@ void ChunkLoader::update(sf::View const& view) {
 	}
 }
 
-void ChunkLoader::loadChunks(sf::Vector2i centerChunk) {
+void ChunkManager::loadChunks(sf::Vector2i centerChunk) {
 	for (auto y = -renderDistance_v; y <= renderDistance_v; y++) {
 		for (auto x = -renderDistance_v; x <= renderDistance_v; x++) {
 			auto coord = sf::Vector2i{centerChunk.x + x, centerChunk.y + y};
@@ -43,7 +43,7 @@ void ChunkLoader::loadChunks(sf::Vector2i centerChunk) {
 	}
 }
 
-void ChunkLoader::unloadChunks(sf::Vector2i centerChunk) {
+void ChunkManager::unloadChunks(sf::Vector2i centerChunk) {
 	for (auto it = m_chunks.begin(); it != m_chunks.end();) {
 		auto dx = std::abs(it->first.x - centerChunk.x);
 		auto dy = std::abs(it->first.y - centerChunk.y);
@@ -56,7 +56,7 @@ void ChunkLoader::unloadChunks(sf::Vector2i centerChunk) {
 	}
 }
 
-void ChunkLoader::computeChunkFaces() {
+void ChunkManager::computeChunkFaces() {
 	for (auto& [coord, chunk] : m_chunks) {
 		chunk.computeFaces([&](sf::Vector2i neighbour) -> Chunk* {
 			auto it = m_chunks.find(neighbour);
@@ -65,7 +65,7 @@ void ChunkLoader::computeChunkFaces() {
 	}
 }
 
-void ChunkLoader::draw(sf::RenderTarget& target) const {
+void ChunkManager::draw(sf::RenderTarget& target, Settings const& settings) const {
 	auto sorted = std::vector<Chunk const*>{};
 	sorted.reserve(m_chunks.size());
 	for (auto const& [coord, chunk] : m_chunks) { sorted.push_back(&chunk); }
@@ -73,5 +73,8 @@ void ChunkLoader::draw(sf::RenderTarget& target) const {
 		return (a->position().x + a->position().y) < (b->position().x + b->position().y);
 	});
 	for (auto const* chunk : sorted) { chunk->draw(target); }
+	if (settings.drawChunkBorders) {
+		for (auto const* chunk : sorted) { chunk->drawChunkBorders(target); }
+	}
 }
 } // namespace resurgo

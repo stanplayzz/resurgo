@@ -1,5 +1,4 @@
 #pragma once
-#include "clib/enum_array.hpp"
 #include "resurgo/gameplay/item.hpp"
 #include <cassert>
 

@@ -13,7 +13,7 @@ Scene::Scene(clib::not_null<App const*> app) : m_app(app) {
 	m_materialsUI.emplace(&m_storage, sf::Vector2f{m_app->window().getSize()});
 }
 
-auto Scene::update(sf::Time /*deltaTime*/) -> std::unique_ptr<State> {
+auto Scene::update(sf::Time deltaTime) -> std::unique_ptr<State> {
 	auto const& window = m_app->window();
 	if (m_panning) {
 		auto mouse = sf::Mouse::getPosition(window);
@@ -21,7 +21,7 @@ auto Scene::update(sf::Time /*deltaTime*/) -> std::unique_ptr<State> {
 		m_panningPosition = mouse;
 	}
 
-	m_world.update(m_view);
+	m_world.update(deltaTime, m_view);
 
 	m_materialsUI->update();
 
@@ -30,7 +30,7 @@ auto Scene::update(sf::Time /*deltaTime*/) -> std::unique_ptr<State> {
 
 void Scene::draw(sf::RenderTarget& target) const {
 	target.setView(m_view);
-	m_world.draw(target);
+	m_world.draw(target, m_settings);
 
 	target.setView(target.getDefaultView());
 	m_materialsUI->draw(target, {});
@@ -52,7 +52,7 @@ void Scene::handleInput(sf::Event const& event) {
 		auto step = (mouse->delta > 0) ? 0.9f : 1.1f;
 		auto newZoom = zoomLevel * step;
 
-		newZoom = std::clamp(newZoom, 0.1f, 2.f);
+		newZoom = std::clamp(newZoom, 0.1f, 5.f);
 		zoomLevel = newZoom;
 
 		m_view.setSize(window.getDefaultView().getSize() * newZoom);
@@ -60,10 +60,16 @@ void Scene::handleInput(sf::Event const& event) {
 
 	if (event.is<sf::Event::MouseButtonReleased>()) { m_panning = false; }
 
-	// TESTING
+	// SETTINGS
 	if (auto const* key = event.getIf<sf::Event::KeyPressed>()) {
-		if (key->scancode == sf::Keyboard::Scancode::S) { m_storage.save(); }
-		if (key->scancode == sf::Keyboard::Scancode::A) { m_storage.add(Item::Iron); }
+		if (key->scancode == sf::Keyboard::Scancode::Z && sf::Keyboard::isKeyPressed(sf::Keyboard::Key::LControl)) {
+			m_settings.drawChunkBorders = !m_settings.drawChunkBorders;
+		}
+		if (key->scancode == sf::Keyboard::Scancode::X && sf::Keyboard::isKeyPressed(sf::Keyboard::Key::LControl)) {
+			m_settings.drawHitboxes = !m_settings.drawHitboxes;
+		}
 	}
+
+	m_world.handleInput(event);
 }
 } // namespace resurgo

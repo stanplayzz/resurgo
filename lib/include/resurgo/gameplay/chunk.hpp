@@ -14,14 +14,13 @@ class Chunk : public sf::Drawable {
 	[[nodiscard]] auto position() const -> sf::Vector2i { return m_position; }
 	void setPosition(sf::Vector2i position) { m_position = position; }
 
-	[[nodiscard]] auto tileAt(sf::Vector2i coord) const -> Tile {
-		for (auto const& tile : m_tiles) {
-			if (tile.position.x == coord.x && tile.position.y == coord.y) { return tile; }
-		}
-		return {};
+	[[nodiscard]] auto tileAt(sf::Vector2i localCoord) const -> Tile const& {
+		return m_tiles.at(static_cast<std::size_t>((localCoord.y * chunkSize_v) + localCoord.x));
 	}
+	[[nodiscard]] auto tiles() const -> std::vector<Tile> const& { return m_tiles; }
 
 	void draw(sf::RenderTarget& target, sf::RenderStates states = {}) const override;
+	void drawChunkBorders(sf::RenderTarget& target) const;
 
   private:
 	void createQuad(sf::Vector2f p1, sf::Vector2f p2, sf::Vector2f p3, sf::Vector2f p4, sf::FloatRect rect,
@@ -32,8 +31,7 @@ class Chunk : public sf::Drawable {
 
 	sf::Vector2i m_position{};
 	std::vector<Tile> m_tiles{};
-	sf::VertexArray m_topFaces{};
-	sf::VertexArray m_sidesFaces{};
 	sf::VertexArray m_vertexArray{};
+	std::vector<Tile> m_sortedTiles{};
 };
 } // namespace resurgo
