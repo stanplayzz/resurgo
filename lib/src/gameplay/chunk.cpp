@@ -41,7 +41,7 @@ void Chunk::computeFaces(std::function<Chunk*(sf::Vector2i)> const& getNeighbour
 				leftZ = m_tiles.at((y * chunkSize_v) + (x + 1)).position.z;
 			} else {
 				auto* n = getNeighbour({m_position.x + 1, m_position.y});
-				if (n) { leftZ = n->tileAt({0, static_cast<int>(y)}).position.z; }
+				if (n) { leftZ = n->tileAt({0, static_cast<int>(y)})->position.z; }
 			}
 
 			// y+1 neighbour
@@ -49,7 +49,7 @@ void Chunk::computeFaces(std::function<Chunk*(sf::Vector2i)> const& getNeighbour
 				rightZ = m_tiles.at(((y + 1) * chunkSize_v) + x).position.z;
 			} else {
 				auto* n = getNeighbour({m_position.x, m_position.y + 1});
-				if (n) { rightZ = n->tileAt({static_cast<int>(x), 0}).position.z; }
+				if (n) { rightZ = n->tileAt({static_cast<int>(x), 0})->position.z; }
 			}
 
 			tile.leftFaceHeight = std::max(0, tile.position.z - leftZ);

@@ -14,8 +14,8 @@ class Chunk : public sf::Drawable {
 	[[nodiscard]] auto position() const -> sf::Vector2i { return m_position; }
 	void setPosition(sf::Vector2i position) { m_position = position; }
 
-	[[nodiscard]] auto tileAt(sf::Vector2i localCoord) const -> Tile const& {
-		return m_tiles.at(static_cast<std::size_t>((localCoord.y * chunkSize_v) + localCoord.x));
+	[[nodiscard]] auto tileAt(sf::Vector2i localCoord) const -> Tile const* {
+		return &m_tiles.at(static_cast<std::size_t>((localCoord.y * chunkSize_v) + localCoord.x));
 	}
 	[[nodiscard]] auto tiles() const -> std::vector<Tile> const& { return m_tiles; }
 

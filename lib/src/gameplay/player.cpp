@@ -26,13 +26,18 @@ constexpr auto getElevationAt(ChunkManager const& chunks, sf::Vector2f screenPos
 	}
 	return bestZ;
 };
+
+constexpr auto playerTextureSize_v = sf::Vector2i{31, 56};
+constexpr auto animSpeed_v = 0.3f; // seconds per frame
 } // namespace
 
 Player::Player() : m_player{*Resources::instance().load<sf::Texture>("images/player.png")} {
-	m_player.setScale({2, 2});
+	m_player.setScale({3, 3});
+	setSprite(0);
 
 	m_hitbox.size = m_player.getGlobalBounds().size;
 	m_hitbox.size.x *= 0.6f;
+	m_hitbox.size.y *= 0.75f;
 	m_hitbox.position = m_player.getGlobalBounds().getCenter() - m_hitbox.size * 0.5f;
 }
 
@@ -56,7 +61,26 @@ void Player::update(sf::Time deltaTime, ChunkManager const& chunks) {
 		m_elevation = std::max(m_elevation, getElevationAt(chunks, {x, playerPos.y}));
 	}
 
-	m_hitbox.position.y += static_cast<float>(-m_elevation * tileSize_v) * 0.25f;
+	m_hitbox.position.y -= static_cast<float>(m_elevation * tileSize_v) * 0.25f;
+
+	animate(deltaTime);
+}
+
+void Player::animate(sf::Time deltaTime) {
+	m_animTime += deltaTime.asSeconds();
+	if (m_animTime > animSpeed_v) {
+		m_animTime -= animSpeed_v;
+
+		auto moving = m_moveDirection.x != 0 || m_moveDirection.y != 0;
+		auto id = 0;
+		if (moving) {
+			id = ((m_currentFrame + 1) % 5);
+			if (id == 0) { id = 1; }
+		}
+		m_currentFrame = id;
+
+		setSprite(id, m_flipped);
+	}
 }
 
 void Player::draw(sf::RenderTarget& target, Settings const& settings) const {
@@ -66,7 +90,7 @@ void Player::draw(sf::RenderTarget& target, Settings const& settings) const {
 	target.draw(m_player, playerStates);
 
 	if (settings.drawHitboxes) {
-		static sf::RectangleShape hitbox{};
+		sf::RectangleShape hitbox{};
 		hitbox.setPosition(m_hitbox.position);
 		hitbox.setSize(m_hitbox.size);
 		hitbox.setFillColor(sf::Color::Transparent);
@@ -79,8 +103,16 @@ void Player::handleInput(sf::Event const& event) {
 	if (auto const* key = event.getIf<sf::Event::KeyPressed>()) {
 		if (key->scancode == sf::Keyboard::Scancode::W) { m_moveDirection.y = -1; }
 		if (key->scancode == sf::Keyboard::Scancode::S) { m_moveDirection.y = 1; }
-		if (key->scancode == sf::Keyboard::Scancode::A) { m_moveDirection.x = -1; }
-		if (key->scancode == sf::Keyboard::Scancode::D) { m_moveDirection.x = 1; }
+		if (key->scancode == sf::Keyboard::Scancode::A) {
+			m_moveDirection.x = -1;
+			m_flipped = true;
+			setSprite(m_currentFrame, m_flipped);
+		}
+		if (key->scancode == sf::Keyboard::Scancode::D) {
+			m_moveDirection.x = 1;
+			m_flipped = false;
+			setSprite(m_currentFrame, m_flipped);
+		}
 	}
 	if (auto const* key = event.getIf<sf::Event::KeyReleased>()) {
 		if (key->scancode == sf::Keyboard::Scancode::W) { m_moveDirection.y = 0; }
@@ -89,4 +121,12 @@ void Player::handleInput(sf::Event const& event) {
 		if (key->scancode == sf::Keyboard::Scancode::D) { m_moveDirection.x = 0; }
 	}
 }
+
+void Player::setSprite(int id, bool flipped) {
+	m_player.setTextureRect({{
+								 flipped ? playerTextureSize_v.x : 0,
+								 id * playerTextureSize_v.y,
+							 },
+							 {playerTextureSize_v.x * (flipped ? -1 : 1), playerTextureSize_v.y}});
+};
 } // namespace resurgo

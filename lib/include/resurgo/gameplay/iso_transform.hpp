@@ -1,5 +1,6 @@
 #pragma once
 #include "resurgo/gameplay/chunk.hpp"
+#include "resurgo/gameplay/chunk_manager.hpp"
 #include <SFML/System/Vector2.hpp>
 
 namespace resurgo::IsoTransform {
@@ -31,6 +32,30 @@ constexpr auto tileToChunk(sf::Vector2i tilePos) -> sf::Vector2i {
 constexpr auto tileToLocalCoord(sf::Vector2i tilePos) -> sf::Vector2i {
 	return {((tilePos.x % chunkSize_v) + chunkSize_v) % chunkSize_v,
 			((tilePos.y % chunkSize_v) + chunkSize_v) % chunkSize_v};
+}
+
+constexpr auto getTileFromPoint(sf::Vector2f point, ChunkManager const& chunks) -> Tile const* {
+	point.x -= tileSize_v * 0.5f;
+
+	auto tilePos = IsoTransform::screenToTile(point);
+	auto localPos = IsoTransform::tileToLocalCoord(tilePos);
+	auto chunkPos = IsoTransform::tileToChunk(tilePos);
+
+	auto const* chunk = chunks.getChunkAt(chunkPos);
+	if (!chunk) { return nullptr; }
+
+	auto const* tile = chunk->tileAt(localPos);
+	if (!tile) { return nullptr; }
+
+	point.y += static_cast<float>(tile->position.z * tileSize_v) * 0.25f;
+	tilePos = IsoTransform::screenToTile(point);
+	localPos = IsoTransform::tileToLocalCoord(tilePos);
+	chunkPos = IsoTransform::tileToChunk(tilePos);
+
+	chunk = chunks.getChunkAt(chunkPos);
+	if (!chunk) { return nullptr; }
+
+	return chunk->tileAt(localPos);
 }
 
 } // namespace resurgo::IsoTransform
