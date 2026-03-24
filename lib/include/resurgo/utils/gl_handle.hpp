@@ -79,9 +79,9 @@ inline GLHandle createTexture() {
 	return {GLObjectType::Texture, id};
 }
 
-inline GLHandle createProgram() { return GLHandle(GLObjectType::Program, glCreateProgram()); }
+inline GLHandle createProgram() { return {GLObjectType::Program, glCreateProgram()}; }
 
-inline GLHandle createShader(GLenum type) { return GLHandle(GLObjectType::Shader, glCreateShader(type)); }
+inline GLHandle createShader(GLenum type) { return {GLObjectType::Shader, glCreateShader(type)}; }
 
 inline GLHandle createFramebuffer() {
 	GLuint id{};

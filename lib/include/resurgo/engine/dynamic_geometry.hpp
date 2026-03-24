@@ -1,11 +1,11 @@
 #pragma once
+#include "resurgo/engine/geometry.hpp"
 #include "resurgo/engine/vertex.hpp"
 #include "resurgo/utils/gl_handle.hpp"
-#include <clib/base_types.hpp>
 #include <vector>
 
 namespace resurgo::engine {
-class DynamicGeometry : public clib::MoveOnly {
+class DynamicGeometry : public IGeometry {
   public:
 	DynamicGeometry();
 
@@ -17,7 +17,7 @@ class DynamicGeometry : public clib::MoveOnly {
 	// Call this after changing geometry
 	void upload();
 
-	void draw() const;
+	void draw() const override;
 
   private:
 	GLHandle m_vao{};

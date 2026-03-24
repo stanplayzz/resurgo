@@ -7,14 +7,12 @@
 namespace resurgo {
 namespace {
 constexpr auto cameraSpeed_v = 100.f;
-constexpr auto windowWidth_v = 1280;
-constexpr auto windowHeight_v = 720;
 } // namespace
 
 App::App() {
 	if (!glfwInit()) { throw std::runtime_error{"Failed to initialize GLFW"}; }
 
-	m_window = glfwCreateWindow(windowWidth_v, windowHeight_v, std::format("Resurgo {}", buildVersionStr_v).c_str(),
+	m_window = glfwCreateWindow(m_windowSize.x, m_windowSize.y, std::format("Resurgo {}", buildVersionStr_v).c_str(),
 								nullptr, nullptr);
 	glfwMakeContextCurrent(m_window);
 
@@ -27,7 +25,7 @@ App::App() {
 	glEnable(GL_CULL_FACE);
 
 	engine::Input::init(m_window);
-	m_camera.updateSize({windowWidth_v, windowHeight_v});
+	m_camera.updateSize(m_windowSize);
 }
 
 App::~App() {
@@ -36,9 +34,12 @@ App::~App() {
 }
 
 void App::run() {
+	preloadResources();
+
 	auto lastTime = static_cast<float>(glfwGetTime());
 
 	// camera transform for dimetric view
+	m_camera.transform.position.z = 700.f;
 	m_camera.transform.rotation = {glm::radians(90.f) - std::atan(std::sin(glm::radians(30.f))), 0.f,
 								   glm::radians(45.f)};
 
@@ -48,7 +49,10 @@ void App::run() {
 		lastTime = currentTime;
 
 		engine::Input::update();
-		if (auto size = engine::Input::resized()) { m_camera.updateSize(*size); }
+		if (auto size = engine::Input::resized()) {
+			m_windowSize = *size;
+			m_camera.updateSize(*size);
+		}
 		transformCamera(deltaTime);
 
 		m_chunkManager.update({0, 0});
@@ -58,9 +62,17 @@ void App::run() {
 
 		m_chunkManager.draw(m_renderer);
 
-		m_renderer.end();
+		m_renderer.end(m_windowSize);
 		glfwSwapBuffers(m_window);
 	}
+}
+
+// NOLINTNEXTLINE(readability-convert-member-functions-to-static)
+void App::preloadResources() {
+	engine::Resources::instance().loadShader("DepthShader", ASSETS_DIR "/shaders/depth_shader.vert",
+											 ASSETS_DIR "/shaders/depth_shader.frag");
+	engine::Resources::instance().loadShader("TerrainShader", ASSETS_DIR "/shaders/terrain.vert",
+											 ASSETS_DIR "/shaders/terrain.frag");
 }
 
 void App::transformCamera(float deltaTime) {

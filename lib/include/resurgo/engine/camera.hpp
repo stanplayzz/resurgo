@@ -9,8 +9,8 @@ class Camera {
   public:
 	Transform transform{};
 
-	float nearPlane = -1000000.f;
-	float farPlane = 10000000.0f;
+	float nearPlane = 0.1f;
+	float farPlane = 10000.0f;
 
 	[[nodiscard]] auto getViewMatrix() const -> glm::mat4 { return glm::inverse(transform.getModelMatrix()); }
 
