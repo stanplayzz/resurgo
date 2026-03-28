@@ -3,6 +3,7 @@
 #include "resurgo/engine/geometry.hpp"
 #include "resurgo/engine/material.hpp"
 #include "resurgo/engine/shadow_map.hpp"
+#include "resurgo/engine/text.hpp"
 #include "resurgo/utils/color.hpp"
 #include <GL/gl.h>
 #include <glm/mat4x4.hpp>
@@ -13,6 +14,7 @@ class Renderer {
   public:
 	void begin(Camera const& camera);
 	void draw(IGeometry const* geometry, Material const* material, Transform transform);
+	void draw(Text& text);
 	void end(glm::ivec2 screenSize);
 
 	// NOLINTNEXTLINE(readability-convert-member-functions-to-static)
@@ -30,6 +32,7 @@ class Renderer {
 
 	glm::mat4 m_viewProjection{};
 	std::vector<RenderCommand> m_commands{};
+	std::vector<Text const*> m_texts{};
 	Camera const* m_camera{};
 
 	std::optional<ShadowMap> m_shadowMap{};

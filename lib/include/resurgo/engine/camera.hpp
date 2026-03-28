@@ -20,6 +20,8 @@ class Camera {
 		return glm::ortho(-width * 0.5f, width * 0.5f, -height * 0.5f, height * 0.5f, nearPlane, farPlane);
 	}
 
+	[[nodiscard]] auto getSize() const -> glm::vec2 { return m_size; }
+
 	void updateSize(glm::vec2 windowSize) { m_size = windowSize; }
 
   private:

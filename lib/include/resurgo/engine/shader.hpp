@@ -30,6 +30,8 @@ class Shader {
 			glUniformMatrix3fv(location, 1, GL_FALSE, &value[0][0]);
 		} else if constexpr (std::is_same_v<T, glm::mat4>) {
 			glUniformMatrix4fv(location, 1, GL_FALSE, &value[0][0]);
+		} else if constexpr (std::is_same_v<T, glm::mat<4, 4, int>>) {
+			glUniformMatrix4fv(location, 1, GL_FALSE, &glm::mat4(value)[0][0]);
 		} else {
 			static_assert(!sizeof(T), "Unsupported uniform type");
 		}

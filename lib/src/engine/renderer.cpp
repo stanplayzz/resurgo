@@ -7,6 +7,7 @@ void Renderer::begin(Camera const& camera) {
 	m_viewProjection = camera.getProjectionMatrix() * camera.getViewMatrix();
 	m_camera = &camera;
 	m_commands.clear();
+	m_texts.clear();
 }
 
 void Renderer::draw(IGeometry const* geometry, Material const* material, Transform transform) {
@@ -17,6 +18,8 @@ void Renderer::draw(IGeometry const* geometry, Material const* material, Transfo
 
 	m_commands.push_back(cmd);
 }
+
+void Renderer::draw(Text& text) { m_texts.push_back(&text); }
 
 void Renderer::end(glm::ivec2 screenSize) {
 	// Shadow pass
@@ -45,6 +48,15 @@ void Renderer::end(glm::ivec2 screenSize) {
 		shader.setUniform("u_ShadowMap", 1);
 
 		cmd.geometry->draw();
+	}
+
+	// text pass
+	if (!m_texts.empty()) {
+		auto proj = glm::ortho(0.f, m_camera->getSize().x, 0.f, m_camera->getSize().y);
+
+		glDisable(GL_DEPTH_TEST);
+		for (auto const* text : m_texts) { text->draw(proj); }
+		glEnable(GL_DEPTH_TEST);
 	}
 }
 

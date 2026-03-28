@@ -1,4 +1,5 @@
 #pragma once
+#include "resurgo/engine/font.hpp"
 #include "resurgo/engine/shader.hpp"
 #include "resurgo/engine/texture.hpp"
 #include <memory>
@@ -48,13 +49,30 @@ class Resources {
 		throw std::runtime_error{"Texture not found: " + path};
 	}
 
+	// Fonts
+	auto loadFont(std::string const& path) -> std::shared_ptr<Font> {
+		if (auto it = m_fonts.find(path); it != m_fonts.end()) { return it->second; }
+
+		auto font = std::make_shared<Font>(path);
+		m_fonts[path] = font;
+		return font;
+	}
+
+	auto getFont(std::string const& path) -> std::shared_ptr<Font> {
+		if (auto it = m_fonts.find(path); it != m_fonts.end()) { return it->second; }
+		throw std::runtime_error{"Font not found: " + path};
+	}
+
 	void unloadShader(std::string const& name) { m_shaders.erase(name); }
 
 	void unloadTexture(std::string const& path) { m_textures.erase(path); }
 
+	void unloadFont(std::string const& path) { m_fonts.erase(path); }
+
 	void unloadAll() {
 		m_shaders.clear();
 		m_textures.clear();
+		m_fonts.clear();
 	}
 
   private:
@@ -62,6 +80,7 @@ class Resources {
 
 	std::unordered_map<std::string, std::shared_ptr<Shader>> m_shaders;
 	std::unordered_map<std::string, std::shared_ptr<Texture>> m_textures;
+	std::unordered_map<std::string, std::shared_ptr<Font>> m_fonts;
 };
 
 } // namespace resurgo::engine

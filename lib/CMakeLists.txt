@@ -3,10 +3,6 @@ project(${package_name}-lib VERSION ${build_version})
 add_library(${PROJECT_NAME})
 add_library(${package_name}::${PROJECT_NAME} ALIAS ${PROJECT_NAME})
 
-target_include_directories(${PROJECT_NAME} PUBLIC
-    ${CMAKE_SOURCE_DIR}/ext/src
-)
-
 target_link_libraries(${PROJECT_NAME} PUBLIC
     glad
     stb_image
@@ -14,6 +10,12 @@ target_link_libraries(${PROJECT_NAME} PUBLIC
     OpenGL
     clib::lib
     glm
+    freetype
+)
+
+target_include_directories(${PROJECT_NAME} PUBLIC
+    ${CMAKE_SOURCE_DIR}/ext/src
+    ${FREETYPE_INCLUDE_DIRS}
 )
 
 target_compile_features(${PROJECT_NAME} PUBLIC

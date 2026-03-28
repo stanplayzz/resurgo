@@ -2,12 +2,12 @@
 #include <glad/glad.h>
 
 #include "resurgo/engine/renderer.hpp"
-#include "resurgo/game/chunk_manager.hpp"
+#include "resurgo/game/state_manager.hpp"
 #include <GLFW/glfw3.h>
 
 namespace resurgo {
 // NOLINTNEXTLINE(cppcoreguidelines-special-member-functions)
-class App { // ignore
+class App {
   public:
 	App();
 	~App();
@@ -17,9 +17,7 @@ class App { // ignore
   private:
 	void preloadResources();
 
-	void transformCamera(float deltaTime);
-
-	ChunkManager m_chunkManager{};
+	StateManager m_stateManager{};
 
 	GLFWwindow* m_window{};
 	glm::ivec2 m_windowSize{1280, 720};

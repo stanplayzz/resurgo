@@ -11,7 +11,7 @@ class GameObject : clib::Polymorphic {
 	GameObject(Geometry geometry, std::shared_ptr<Shader> shader)
 		: material(std::move(shader)), m_geometry(std::move(geometry)) {}
 
-	void draw(Renderer& renderer) const { renderer.draw(*this); }
+	void draw(Renderer& renderer) const { renderer.draw(&m_geometry, &material, transform); }
 
 	Transform transform{};
 	Material material{};

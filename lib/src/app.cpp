@@ -1,13 +1,12 @@
 #include "resurgo/app.hpp"
 #include "resurgo/build_version.hpp"
 #include "resurgo/engine/input.hpp"
+#include "resurgo/engine/text.hpp"
+#include "resurgo/game/gameplay.hpp"
 #include <format>
 #include <stdexcept>
 
 namespace resurgo {
-namespace {
-constexpr auto cameraSpeed_v = 100.f;
-} // namespace
 
 App::App() {
 	if (!glfwInit()) { throw std::runtime_error{"Failed to initialize GLFW"}; }
@@ -23,6 +22,8 @@ App::App() {
 
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	engine::Input::init(m_window);
 	m_camera.updateSize(m_windowSize);
@@ -38,10 +39,12 @@ void App::run() {
 
 	auto lastTime = static_cast<float>(glfwGetTime());
 
-	// camera transform for dimetric view
-	m_camera.transform.position.z = 700.f;
-	m_camera.transform.rotation = {glm::radians(90.f) - std::atan(std::sin(glm::radians(30.f))), 0.f,
-								   glm::radians(45.f)};
+	m_stateManager.switchState(std::make_unique<Gameplay>(m_camera));
+
+	auto font = engine::Resources::instance().loadFont(ASSETS_DIR "/fonts/Roboto.ttf");
+	auto text = engine::Text{*font.get()};
+	text.setString("Hello World");
+	text.setPosition({50, 300});
 
 	while (!glfwWindowShouldClose(m_window)) {
 		auto currentTime = static_cast<float>(glfwGetTime());
@@ -53,14 +56,12 @@ void App::run() {
 			m_windowSize = *size;
 			m_camera.updateSize(*size);
 		}
-		transformCamera(deltaTime);
-
-		m_chunkManager.update({0, 0});
+		m_stateManager.update(deltaTime, m_camera);
 
 		m_renderer.clear(Color::Black);
 		m_renderer.begin(m_camera);
 
-		m_chunkManager.draw(m_renderer);
+		m_stateManager.draw(m_renderer);
 
 		m_renderer.end(m_windowSize);
 		glfwSwapBuffers(m_window);
@@ -73,12 +74,5 @@ void App::preloadResources() {
 											 ASSETS_DIR "/shaders/depth_shader.frag");
 	engine::Resources::instance().loadShader("TerrainShader", ASSETS_DIR "/shaders/terrain.vert",
 											 ASSETS_DIR "/shaders/terrain.frag");
-}
-
-void App::transformCamera(float deltaTime) {
-	if (engine::Input::isKeyPressed(GLFW_KEY_W)) { m_camera.transform.position.y += cameraSpeed_v * deltaTime; }
-	if (engine::Input::isKeyPressed(GLFW_KEY_S)) { m_camera.transform.position.y -= cameraSpeed_v * deltaTime; }
-	if (engine::Input::isKeyPressed(GLFW_KEY_A)) { m_camera.transform.position.x -= cameraSpeed_v * deltaTime; }
-	if (engine::Input::isKeyPressed(GLFW_KEY_D)) { m_camera.transform.position.x += cameraSpeed_v * deltaTime; }
 }
 } // namespace resurgo

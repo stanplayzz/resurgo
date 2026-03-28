@@ -21,6 +21,10 @@ add_subdirectory(src/glm)
 message(STATUS "[clib]")
 add_subdirectory(src/clib)
 
+# freetype
+message(STATUS "[freetype]")
+add_subdirectory(src/freetype)
+
 # stb image
 message(STATUS "[stb_image.h]")
 add_library(stb_image STATIC src/stb_image.cpp)
