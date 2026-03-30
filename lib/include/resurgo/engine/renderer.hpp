@@ -7,15 +7,18 @@
 #include "resurgo/utils/color.hpp"
 #include <GL/gl.h>
 #include <glm/mat4x4.hpp>
-#include <optional>
 
 namespace resurgo::engine {
 class Renderer {
   public:
-	void begin(Camera const& camera);
+	Renderer();
+
+	void begin();
 	void draw(IGeometry const* geometry, Material const* material, Transform transform);
-	void draw(Text& text);
-	void end(glm::ivec2 screenSize);
+	void draw(Text const& text);
+	void end(ShadowMap const* shadowMap = nullptr);
+
+	void setCamera(Camera const& camera);
 
 	// NOLINTNEXTLINE(readability-convert-member-functions-to-static)
 	void clear(Color const& c = {}) {
@@ -24,18 +27,24 @@ class Renderer {
 	}
 
   private:
+	void mainPass(ShadowMap const* shadowMap);
+	void textPass();
+
 	struct RenderCommand {
 		IGeometry const* geometry;
 		Material const* material;
 		glm::mat4 modelMatrix;
+		glm::mat4 viewProjection;
 	};
 
-	glm::mat4 m_viewProjection{};
-	std::vector<RenderCommand> m_commands{};
-	std::vector<Text const*> m_texts{};
-	Camera const* m_camera{};
+	struct TextCommand {
+		Text const* text;
+		glm::mat4 viewProjection;
+	};
 
-	std::optional<ShadowMap> m_shadowMap{};
-	glm::vec3 m_lightDir{0.2f, -0.6f, 1.f};
+	std::vector<RenderCommand> m_commands{};
+	std::vector<TextCommand> m_textCommands{};
+
+	glm::mat4 m_activeViewProjection{};
 };
 } // namespace resurgo::engine

@@ -10,7 +10,7 @@ constexpr auto ndcCorners_v = std::array<glm::vec3, 8>{
 };
 }
 
-ShadowMap::ShadowMap(int resolution)
+ShadowMap::ShadowMap(unsigned int resolution)
 	: m_resolution(resolution), m_fbo(createFramebuffer()), m_depthMap(createTexture()) {
 	glBindTexture(GL_TEXTURE_2D, m_depthMap.get());
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, m_resolution, m_resolution, 0, GL_DEPTH_COMPONENT, GL_FLOAT,

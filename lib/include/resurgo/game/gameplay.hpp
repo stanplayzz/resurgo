@@ -5,14 +5,15 @@
 namespace resurgo {
 class Gameplay : public State {
   public:
-	Gameplay(engine::Camera& camera);
+	Gameplay();
 
-	auto update(float deltaTime, engine::Camera& camera) -> std::unique_ptr<State> override;
+	auto update(float deltaTime) -> std::unique_ptr<State> override;
 	void draw(engine::Renderer& renderer) const override;
 
   private:
-	void transformCamera(float deltaTime, engine::Camera& camera);
+	void transformCamera(float deltaTime);
 
 	ChunkManager m_chunkManager{};
+	engine::Camera m_camera{};
 };
 } // namespace resurgo

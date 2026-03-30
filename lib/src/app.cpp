@@ -26,7 +26,6 @@ App::App() {
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	engine::Input::init(m_window);
-	m_camera.updateSize(m_windowSize);
 }
 
 App::~App() {
@@ -39,7 +38,7 @@ void App::run() {
 
 	auto lastTime = static_cast<float>(glfwGetTime());
 
-	m_stateManager.switchState(std::make_unique<Gameplay>(m_camera));
+	m_stateManager.switchState(std::make_unique<Gameplay>());
 
 	auto font = engine::Resources::instance().loadFont(ASSETS_DIR "/fonts/Roboto.ttf");
 	auto text = engine::Text{*font.get()};
@@ -52,18 +51,15 @@ void App::run() {
 		lastTime = currentTime;
 
 		engine::Input::update();
-		if (auto size = engine::Input::resized()) {
-			m_windowSize = *size;
-			m_camera.updateSize(*size);
-		}
-		m_stateManager.update(deltaTime, m_camera);
+		if (auto size = engine::Input::resized()) { m_windowSize = *size; }
+		m_stateManager.update(deltaTime);
 
 		m_renderer.clear(Color::Black);
-		m_renderer.begin(m_camera);
+		m_renderer.begin();
 
 		m_stateManager.draw(m_renderer);
 
-		m_renderer.end(m_windowSize);
+		m_renderer.end();
 		glfwSwapBuffers(m_window);
 	}
 }

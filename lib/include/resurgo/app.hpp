@@ -22,6 +22,5 @@ class App {
 	GLFWwindow* m_window{};
 	glm::ivec2 m_windowSize{1280, 720};
 	engine::Renderer m_renderer{};
-	engine::Camera m_camera{};
 };
 } // namespace resurgo

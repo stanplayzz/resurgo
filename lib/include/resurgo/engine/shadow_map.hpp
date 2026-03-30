@@ -7,7 +7,7 @@
 namespace resurgo::engine {
 class ShadowMap {
   public:
-	ShadowMap(int resolution = 1024);
+	ShadowMap(unsigned int resolution = 1024);
 
 	void bind() const {
 		glViewport(0, 0, m_resolution, m_resolution);
@@ -15,7 +15,7 @@ class ShadowMap {
 		glClear(GL_DEPTH_BUFFER_BIT);
 	}
 
-	void bindDepthMap(int slot) {
+	void bindDepthMap(int slot) const {
 		glActiveTexture(GL_TEXTURE0 + static_cast<GLenum>(slot));
 		glBindTexture(GL_TEXTURE_2D, m_depthMap.get());
 	}
@@ -30,7 +30,7 @@ class ShadowMap {
 	[[nodiscard]] auto getLightSpaceMatrix() const { return m_lightSpaceMatrix; }
 
   private:
-	int m_resolution{};
+	unsigned int m_resolution{};
 
 	GLHandle m_fbo{};
 	GLHandle m_depthMap{};
