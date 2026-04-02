@@ -13,10 +13,12 @@ Texture::Texture(std::string const& path) : m_texture(createTexture()) {
 
 	auto format = GL_RGB;
 	switch (m_channels) {
-	case 1: format = GL_RED;
-	case 3: format = GL_RGB;
-	case 4: format = GL_RGBA;
-	default: break;
+	case 1: format = GL_RED; break;
+	case 3: format = GL_RGB; break;
+	case 4: format = GL_RGBA; break;
+	default:
+		stbi_image_free(data);
+		throw std::runtime_error{"Unsupported channel count: " + std::to_string(m_channels)};
 	}
 
 	glBindTexture(GL_TEXTURE_2D, m_texture.get());

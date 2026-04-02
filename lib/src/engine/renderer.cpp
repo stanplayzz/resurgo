@@ -8,6 +8,7 @@ constexpr auto lightDir_v = glm::vec3{0.2f, -0.6f, 1.f};
 Renderer::Renderer() {
 	Camera defaultCam{};
 	m_activeViewProjection = defaultCam.getProjectionMatrix() * defaultCam.getViewMatrix();
+	m_activeCameraSize = defaultCam.getSize();
 }
 
 void Renderer::begin() {
@@ -17,6 +18,7 @@ void Renderer::begin() {
 
 void Renderer::setCamera(Camera const& camera) {
 	m_activeViewProjection = camera.getProjectionMatrix() * camera.getViewMatrix();
+	m_activeCameraSize = camera.getSize();
 }
 
 void Renderer::draw(IGeometry const* geometry, Material const* material, Transform transform) {
@@ -28,9 +30,7 @@ void Renderer::draw(IGeometry const* geometry, Material const* material, Transfo
 	});
 }
 
-void Renderer::draw(Text const& text) {
-	m_textCommands.push_back({.text = &text, .viewProjection = m_activeViewProjection});
-}
+void Renderer::draw(Text const& text) { m_textCommands.push_back({.text = &text, .cameraSize = m_activeCameraSize}); }
 
 void Renderer::end(ShadowMap const* shadowMap) {
 	if (!m_commands.empty()) { mainPass(shadowMap); }
@@ -57,7 +57,7 @@ void Renderer::mainPass(ShadowMap const* shadowMap) {
 
 void Renderer::textPass() {
 	glDisable(GL_DEPTH_TEST);
-	for (auto const& cmd : m_textCommands) { cmd.text->draw(cmd.viewProjection); }
+	for (auto const& cmd : m_textCommands) { cmd.text->draw(glm::ortho(0.f, cmd.cameraSize.x, cmd.cameraSize.y, 0.f)); }
 	glEnable(GL_DEPTH_TEST);
 }
 

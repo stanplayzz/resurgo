@@ -2,7 +2,7 @@
 #include "resurgo/build_version.hpp"
 #include "resurgo/engine/input.hpp"
 #include "resurgo/engine/text.hpp"
-#include "resurgo/game/gameplay.hpp"
+#include "resurgo/game/entrypoint.hpp"
 #include <format>
 #include <stdexcept>
 
@@ -38,9 +38,9 @@ void App::run() {
 
 	auto lastTime = static_cast<float>(glfwGetTime());
 
-	m_stateManager.switchState(std::make_unique<Gameplay>());
+	m_stateManager.switchState(std::make_unique<Entrypoint>());
 
-	auto font = engine::Resources::instance().loadFont(ASSETS_DIR "/fonts/Roboto.ttf");
+	auto font = engine::Resources::instance().loadFont(ASSETS_DIR "/fonts/roboto.ttf");
 	auto text = engine::Text{*font.get()};
 	text.setString("Hello World");
 	text.setPosition({50, 300});
@@ -57,6 +57,7 @@ void App::run() {
 		m_renderer.clear(Color::Black);
 		m_renderer.begin();
 
+		// m_renderer.draw(text);
 		m_stateManager.draw(m_renderer);
 
 		m_renderer.end();
@@ -70,5 +71,7 @@ void App::preloadResources() {
 											 ASSETS_DIR "/shaders/depth_shader.frag");
 	engine::Resources::instance().loadShader("TerrainShader", ASSETS_DIR "/shaders/terrain.vert",
 											 ASSETS_DIR "/shaders/terrain.frag");
+	engine::Resources::instance().loadFont(ASSETS_DIR "/fonts/roboto.ttf");
+	engine::Resources::instance().loadFont(ASSETS_DIR "/fonts/audiowide.ttf");
 }
 } // namespace resurgo

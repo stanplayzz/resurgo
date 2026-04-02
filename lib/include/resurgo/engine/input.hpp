@@ -14,6 +14,8 @@ class Input {
 	[[nodiscard]] static auto isKeyPressed(int key) -> bool;
 
 	[[nodiscard]] static auto isMouseButtonPressed(int button) -> bool;
+	[[nodiscard]] static auto isMouseButtonClicked(int button) -> bool;
+	[[nodiscard]] static auto isMouseButtonReleased(int button) -> bool;
 	[[nodiscard]] static auto getMousePosition() -> glm::vec2;
 	[[nodiscard]] static auto getMouseDelta() -> glm::vec2;
 	[[nodiscard]] static auto getScrollDelta() -> glm::vec2;
@@ -24,6 +26,7 @@ class Input {
 
 	static std::unordered_set<int> s_keysPressed;
 	static std::unordered_set<int> s_mouseButtonsPressed;
+	static std::unordered_set<int> s_prevMouseButtons;
 
 	static glm::vec2 s_mousePosition;
 	static glm::vec2 s_lastMousePosition;

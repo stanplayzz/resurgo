@@ -14,39 +14,63 @@ Text::Text(Font& font) : m_font(font), m_vao(createVertexArray()), m_vbo(createB
 	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(float), nullptr);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
-	update();
+
+	m_shader = Resources::instance()
+				   .loadShader("TextShader", ASSETS_DIR "/shaders/text.vert", ASSETS_DIR "/shaders/text.frag")
+				   .get();
 }
+
+void Text::setCharacterSize(unsigned int charSize) { m_charSize = charSize; }
 
 void Text::setString(std::string string) { m_string = std::move(string); }
 void Text::setColor(Color color) { m_color = color; }
 void Text::setPosition(glm::vec2 position) { m_position = position; }
 
-void Text::draw(glm::mat4 proj) const {
-	auto shader = Resources::instance().loadShader("TextShader", ASSETS_DIR "/shaders/text.vert",
-												   ASSETS_DIR "/shaders/text.frag");
+auto Text::getBounds() const -> FloatRect {
+	auto x = 0.f;
+	auto minY = std::numeric_limits<float>::max();
+	auto maxY = std::numeric_limits<float>::lowest();
 
-	shader->use();
-	shader->setUniform("u_TextColor", m_color.toVec3());
-	shader->setUniform("u_Projection", proj);
+	if (m_string.empty()) { return {}; }
+
+	for (auto const& c : m_string) {
+		auto const& ch = m_font.getGlyph(static_cast<unsigned char>(c), m_charSize);
+
+		auto yPos = static_cast<float>(ch.size.y - ch.bearing.y);
+		auto h = static_cast<float>(ch.size.y);
+
+		minY = std::min(minY, yPos);
+		maxY = std::max(maxY, yPos + h);
+
+		x += static_cast<float>(ch.advance >> 6);
+	}
+
+	return {.size = {x, maxY - minY}, .position = m_position + glm::vec2{0.f, minY}};
+}
+
+void Text::draw(glm::mat4 proj) const {
+	m_shader->use();
+	m_shader->setUniform("u_TextColor", m_color.toVec3());
+	m_shader->setUniform("u_Projection", proj);
 	glActiveTexture(GL_TEXTURE0);
 	glBindVertexArray(m_vao.get());
 
 	auto x = m_position.x;
 	for (auto const& c : m_string) {
-		auto const& ch = m_characters.at(c);
+		auto const& ch = m_font.getGlyph(static_cast<unsigned char>(c), m_charSize);
 
 		auto xPos = x + static_cast<float>(ch.bearing.x);
-		auto yPos = m_position.y - static_cast<float>(ch.size.y - ch.bearing.y);
+		auto yPos = m_position.y + static_cast<float>(ch.size.y - ch.bearing.y);
 		auto w = static_cast<float>(ch.size.x);
 		auto h = static_cast<float>(ch.size.y);
 
 		auto vertices = std::array<std::array<float, 4>, 6>{{
-			{xPos, yPos + h, 0, 0},
-			{xPos, yPos, 0, 1},
-			{xPos + w, yPos, 1, 1},
-			{xPos, yPos + h, 0, 0},
-			{xPos + w, yPos, 1, 1},
-			{xPos + w, yPos + h, 1, 0},
+			{xPos, yPos, 0, 0},
+			{xPos, yPos + h, 0, 1},
+			{xPos + w, yPos + h, 1, 1},
+			{xPos, yPos, 0, 0},
+			{xPos + w, yPos + h, 1, 1},
+			{xPos + w, yPos, 1, 0},
 		}};
 
 		glBindTexture(GL_TEXTURE_2D, ch.texture.get());
@@ -59,33 +83,4 @@ void Text::draw(glm::mat4 proj) const {
 	glBindVertexArray(0);
 	glBindTexture(GL_TEXTURE_2D, 0);
 }
-
-void Text::update() {
-	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-
-	auto* glyph = m_font.getFace()->glyph;
-
-	for (unsigned char c = 0; c < 128; c++) {
-		if (FT_Load_Char(m_font.getFace(), c, FT_LOAD_RENDER)) { throw std::runtime_error{"Failed to load glyph"}; }
-
-		auto texture = createTexture();
-		glBindTexture(GL_TEXTURE_2D, texture.get());
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, static_cast<GLsizei>(glyph->bitmap.width),
-					 static_cast<GLsizei>(glyph->bitmap.rows), 0, GL_RED, GL_UNSIGNED_BYTE,
-					 m_font.getFace()->glyph->bitmap.buffer);
-
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-		auto character =
-			Character{.texture = std::move(texture),
-					  .size = {glyph->bitmap.width, glyph->bitmap.rows},
-					  .bearing = {m_font.getFace()->glyph->bitmap_left, m_font.getFace()->glyph->bitmap_top},
-					  .advance = static_cast<int>(m_font.getFace()->glyph->advance.x)};
-		m_characters.emplace(c, std::move(character));
-	}
-}
-
 } // namespace resurgo::engine

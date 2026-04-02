@@ -12,10 +12,10 @@ class Quad : public engine::GameObject {
   private:
 	static engine::Geometry createQuadGeometry() {
 		std::vector<engine::Vertex> vertices = {
-			{{-0.5f, -0.5f, 0.0f}, {0.0f, 0.0f, 1.0f}, {0.0f, 0.0f}},
-			{{0.5f, -0.5f, 0.0f}, {0.0f, 0.0f, 1.0f}, {1.0f, 0.0f}},
-			{{0.5f, 0.5f, 0.0f}, {0.0f, 0.0f, 1.0f}, {1.0f, 1.0f}},
-			{{-0.5f, 0.5f, 0.0f}, {0.0f, 0.0f, 1.0f}, {0.0f, 1.0f}},
+			{.position = {-0.5f, -0.5f, 0.0f}, .normal = {0.0f, 0.0f, 1.0f}, .texCoords = {0.0f, 0.0f}},
+			{.position = {0.5f, -0.5f, 0.0f}, .normal = {0.0f, 0.0f, 1.0f}, .texCoords = {1.0f, 0.0f}},
+			{.position = {0.5f, 0.5f, 0.0f}, .normal = {0.0f, 0.0f, 1.0f}, .texCoords = {1.0f, 1.0f}},
+			{.position = {-0.5f, 0.5f, 0.0f}, .normal = {0.0f, 0.0f, 1.0f}, .texCoords = {0.0f, 1.0f}},
 		};
 
 		std::vector<unsigned int> indices = {0, 1, 2, 2, 3, 0};

@@ -39,12 +39,13 @@ class Renderer {
 
 	struct TextCommand {
 		Text const* text;
-		glm::mat4 viewProjection;
+		glm::vec2 cameraSize;
 	};
 
 	std::vector<RenderCommand> m_commands{};
 	std::vector<TextCommand> m_textCommands{};
 
 	glm::mat4 m_activeViewProjection{};
+	glm::vec2 m_activeCameraSize{};
 };
 } // namespace resurgo::engine

@@ -5,6 +5,7 @@ namespace resurgo::engine {
 GLFWwindow* Input::s_window = nullptr;
 std::unordered_set<int> Input::s_keysPressed;
 std::unordered_set<int> Input::s_mouseButtonsPressed;
+std::unordered_set<int> Input::s_prevMouseButtons;
 glm::vec2 Input::s_mousePosition{};
 glm::vec2 Input::s_lastMousePosition{};
 glm::vec2 Input::s_scrollDelta{};
@@ -28,6 +29,7 @@ void Input::init(GLFWwindow* window) {
 }
 
 void Input::update() {
+	s_prevMouseButtons = s_mouseButtonsPressed;
 	s_lastMousePosition = s_mousePosition;
 	s_scrollDelta = glm::vec2{0.0f, 0.0f};
 	s_lastWindowSize = s_windowSize;
@@ -36,6 +38,14 @@ void Input::update() {
 }
 
 auto Input::isKeyPressed(int key) -> bool { return s_keysPressed.contains(key); }
+
+auto Input::isMouseButtonClicked(int button) -> bool {
+	return !s_prevMouseButtons.contains(button) && s_mouseButtonsPressed.contains(button);
+}
+
+auto Input::isMouseButtonReleased(int button) -> bool {
+	return s_prevMouseButtons.contains(button) && !s_mouseButtonsPressed.contains(button);
+}
 
 auto Input::isMouseButtonPressed(int button) -> bool { return s_mouseButtonsPressed.contains(button); }
 auto Input::getMousePosition() -> glm::vec2 { return s_mousePosition; }
