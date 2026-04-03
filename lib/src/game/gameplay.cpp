@@ -1,23 +1,20 @@
 #include "resurgo/game/gameplay.hpp"
 #include "resurgo/engine/input.hpp"
+#include "resurgo/game/dimetric.hpp"
 
 namespace resurgo {
-namespace {
-constexpr auto cameraSpeed_v = 200.f;
-}
-
 Gameplay::Gameplay() {
 	// camera transform for dimetric view
-	m_camera.transform.position.z = 700.f;
-	m_camera.transform.rotation = {glm::radians(90.f) - std::atan(std::sin(glm::radians(30.f))), 0.f,
-								   glm::radians(45.f)};
+	m_camera.transform.rotation = dimetricView_v;
 	m_camera.updateSize({1280, 720});
+	m_camera.transform.position.z = 700.f;
 }
 
 auto Gameplay::update(float deltaTime) -> std::unique_ptr<State> {
 	if (auto size = engine::Input::resized()) { m_camera.updateSize(*size); }
 
-	m_chunkManager.update({0, 0});
+	m_chunkManager.update(m_player.getPosition());
+	m_player.update(deltaTime, m_chunkManager);
 	transformCamera(deltaTime);
 
 	return nullptr;
@@ -26,14 +23,17 @@ auto Gameplay::update(float deltaTime) -> std::unique_ptr<State> {
 void Gameplay::draw(engine::Renderer& renderer) const {
 	renderer.setCamera(m_camera);
 	m_chunkManager.draw(renderer);
+
+	m_player.draw(renderer);
 }
 
 // NOLINTNEXTLINE(readability-convert-member-functions-to-static)
 void Gameplay::transformCamera(float deltaTime) {
-	if (engine::Input::isKeyPressed(GLFW_KEY_W)) { m_camera.transform.position.y += cameraSpeed_v * deltaTime; }
-	if (engine::Input::isKeyPressed(GLFW_KEY_S)) { m_camera.transform.position.y -= cameraSpeed_v * deltaTime; }
-	if (engine::Input::isKeyPressed(GLFW_KEY_A)) { m_camera.transform.position.x -= cameraSpeed_v * deltaTime; }
-	if (engine::Input::isKeyPressed(GLFW_KEY_D)) { m_camera.transform.position.x += cameraSpeed_v * deltaTime; }
+	glm::vec3 target{};
+	target.x = m_player.getPosition().x + 494.f;
+	target.y = m_player.getPosition().y - 494.f;
+	target.z = 700.f;
+	m_camera.transform.position += (target - m_camera.transform.position) * 5.f * deltaTime;
 }
 
 } // namespace resurgo

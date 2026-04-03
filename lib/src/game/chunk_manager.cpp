@@ -5,9 +5,9 @@ namespace {
 constexpr auto renderDistance_v = 3;
 }
 
-void ChunkManager::update(glm::vec2 playerPos) {
-	auto centerChunk = glm::ivec2{std::floor(playerPos.x / chunkSize_v / tileSize_v),
-								  std::floor(playerPos.y / chunkSize_v / tileSize_v)};
+void ChunkManager::update(glm::vec3 playerPos) {
+	auto centerChunk = glm::ivec2{std::floor(playerPos.x / (chunkSize_v * tileSize_v)),
+								  std::floor(playerPos.y / (chunkSize_v * tileSize_v))};
 
 	if (centerChunk != m_lastCenterChunk) {
 		m_lastCenterChunk = centerChunk;

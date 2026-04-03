@@ -13,7 +13,7 @@ class Shader {
 	template <typename T>
 	void setUniform(std::string const& name, T const& value) {
 		int location = glGetUniformLocation(m_programID, name.c_str());
-
+		if (location == -1) { return; }
 		if constexpr (std::is_same_v<T, int>) {
 			glUniform1i(location, value);
 		} else if constexpr (std::is_same_v<T, float>) {

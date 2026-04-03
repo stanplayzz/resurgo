@@ -15,8 +15,14 @@ struct ChunkHash {
 
 class ChunkManager {
   public:
-	void update(glm::vec2 playerPos);
+	void update(glm::vec3 playerPos);
 	void draw(engine::Renderer& renderer) const;
+
+	[[nodiscard]] auto getChunkAt(glm::ivec2 coords) const -> Chunk const* {
+		auto it = m_chunks.find(coords);
+		if (it == m_chunks.end()) { return nullptr; }
+		return &it->second;
+	}
 
   private:
 	void loadChunks(glm::ivec2 centerChunk);

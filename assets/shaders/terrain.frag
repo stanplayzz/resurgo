@@ -13,6 +13,8 @@ uniform vec3 u_LightDir;
 uniform sampler2D u_Texture;
 uniform sampler2D u_ShadowMap;
 uniform bool u_UseTexture;
+uniform vec2 u_TexRectOffset;
+uniform vec2 u_TexRectSize;
 
 float getShadow(vec4 fragPosLightSpace) {
 	vec3 projCoords = fragPosLightSpace.xyz / fragPosLightSpace.w;
@@ -46,7 +48,8 @@ void main() {
 	vec3 finalColor;
 
 	if (u_UseTexture) {
-		vec4 texColor = texture(u_Texture, TexCoords);
+		vec2 uv = u_TexRectOffset + TexCoords * u_TexRectSize;
+		vec4 texColor = texture(u_Texture, uv);
 		finalColor = texColor.rgb * lighting;
 		finalColor *= Color;
 	} else {

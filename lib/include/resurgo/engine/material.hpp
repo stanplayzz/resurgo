@@ -1,7 +1,9 @@
 #pragma once
+#include "resurgo/engine/floatrect.hpp"
 #include "resurgo/engine/resources.hpp"
 #include "resurgo/utils/color.hpp"
 #include <memory>
+#include <optional>
 #include <utility>
 
 namespace resurgo::engine {
@@ -12,6 +14,7 @@ class Material {
 
 	void setColor(Color const& color) { m_color = color; }
 	void setTexture(std::shared_ptr<Texture> texture) { m_texture = std::move(texture); }
+	void setTextureRect(FloatRect const& rect) { m_textureRect = rect; }
 
 	void setFloat(std::string const& name, float value) { m_floats[name] = value; }
 	void setVec3(std::string const& name, glm::vec3 value) { m_vec3s[name] = value; }
@@ -24,8 +27,17 @@ class Material {
 			m_shader->setUniform("u_UseTexture", true);
 			m_texture->bind(0);
 			m_shader->setUniform("u_Texture", 0);
+
+			auto texSize = glm::vec2(m_texture->getSize());
+			auto rectOffset = m_textureRect ? m_textureRect->position / texSize : glm::vec2{0.f};
+			auto rectSize = m_textureRect ? m_textureRect->size / texSize : glm::vec2{1.f};
+			rectOffset.y = 1.f - rectOffset.y - rectSize.y; // set origin to top left
+			m_shader->setUniform("u_TexRectOffset", rectOffset);
+			m_shader->setUniform("u_TexRectSize", rectSize);
 		} else {
 			m_shader->setUniform("u_UseTexture", false);
+			m_shader->setUniform("u_TexRectOffset", glm::vec2{0.f});
+			m_shader->setUniform("u_TexRectSize", glm::vec2{1.f});
 		}
 
 		for (auto const& [name, value] : m_floats) { m_shader->setUniform(name, value); }
@@ -38,6 +50,7 @@ class Material {
 	std::shared_ptr<Shader> m_shader{};
 	Color m_color{};
 	std::shared_ptr<Texture> m_texture{};
+	std::optional<FloatRect> m_textureRect{};
 	std::unordered_map<std::string, float> m_floats{};
 	std::unordered_map<std::string, glm::vec3> m_vec3s{};
 };
