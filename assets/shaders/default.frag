@@ -17,6 +17,7 @@ void main() {
 	if (u_UseTexture) {
 		vec2 uv = u_TexRectOffset + TexCoords * u_TexRectSize;
 		vec4 texColor = texture(u_Texture, uv);
+		if (texColor.a < 0.01) discard;
 		FragColor = vec4(texColor.rgb * Color, texColor.a);
 	} else {
 		FragColor = vec4(u_Color.rgb * Color, u_Color.a);
