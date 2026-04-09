@@ -4,7 +4,6 @@
 namespace resurgo {
 namespace {
 constexpr auto noiseScale_v = 0.07f;
-constexpr auto terrainHeight_v = 5;
 constexpr auto heightColorFactor_v = 0.1f;
 
 constexpr auto getColorFromHeight(float z) -> Color {

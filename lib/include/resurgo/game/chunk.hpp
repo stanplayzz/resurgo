@@ -5,6 +5,7 @@
 
 namespace resurgo {
 constexpr auto chunkSize_v = 16;
+constexpr auto terrainHeight_v = 5;
 
 class Chunk {
   public:

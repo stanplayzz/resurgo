@@ -1,5 +1,6 @@
 #pragma once
 #include "resurgo/game/chunk_manager.hpp"
+#include "resurgo/game/cursor.hpp"
 #include "resurgo/game/player.hpp"
 #include "resurgo/game/state_manager.hpp"
 
@@ -16,6 +17,7 @@ class Gameplay : public State {
 
 	ChunkManager m_chunkManager{};
 	Player m_player{};
+	Cursor m_cursor{&m_chunkManager};
 
 	engine::Camera m_camera{};
 };

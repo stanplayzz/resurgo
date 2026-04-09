@@ -17,14 +17,16 @@ auto Gameplay::update(float deltaTime) -> std::unique_ptr<State> {
 	m_player.update(deltaTime, m_chunkManager);
 	transformCamera(deltaTime);
 
+	m_cursor.update(deltaTime, m_camera);
+
 	return nullptr;
 }
 
 void Gameplay::draw(engine::Renderer& renderer) const {
 	renderer.setCamera(m_camera);
 	m_chunkManager.draw(renderer);
-
 	m_player.draw(renderer);
+	m_cursor.draw(renderer);
 }
 
 // NOLINTNEXTLINE(readability-convert-member-functions-to-static)

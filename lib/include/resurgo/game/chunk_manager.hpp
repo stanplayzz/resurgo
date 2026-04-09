@@ -24,6 +24,9 @@ class ChunkManager {
 		return &it->second;
 	}
 
+	[[nodiscard]] auto screenToTile(glm::vec2 mousePos, engine::Camera const& camera) const
+		-> std::optional<glm::ivec3>;
+
   private:
 	void loadChunks(glm::ivec2 centerChunk);
 	void unloadChunks(glm::ivec2 centerChunk);

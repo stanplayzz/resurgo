@@ -58,4 +58,48 @@ void ChunkManager::draw(engine::Renderer& renderer) const {
 	for (auto const& [coord, chunk] : m_chunks) { chunk.draw(renderer); }
 }
 
+auto ChunkManager::screenToTile(glm::vec2 mousePos, engine::Camera const& camera) const -> std::optional<glm::ivec3> {
+	auto size = camera.getSize();
+	auto ndc = glm::vec4{
+		((mousePos.x / size.x) * 2.f) - 1.f,
+		1.f - ((mousePos.y / size.y) * 2.f),
+		0.f,
+		1.f,
+	};
+
+	auto invPV = glm::inverse(camera.getProjectionMatrix() * camera.getViewMatrix());
+	auto worldNear = invPV * ndc;
+	worldNear /= worldNear.w;
+	auto worldFar = invPV * glm::vec4{ndc.x, ndc.y, 1.f, 1.f};
+	worldFar /= worldFar.w;
+
+	auto rayDir = glm::normalize(glm::vec3{worldFar} - glm::vec3{worldNear});
+	auto rayOrigin = glm::vec3{worldNear};
+
+	auto tileAtZ = [&](float z) -> Tile const* {
+		auto t = (z - rayOrigin.z) / rayDir.z;
+		auto worldPos = rayOrigin + t * rayDir;
+		auto worldPosF = glm::vec2{worldPos.x / tileSize_v, worldPos.y / tileSize_v};
+		auto worldPosI = glm::ivec2{glm::floor(worldPosF)};
+		auto chunkPos = glm::ivec2{glm::floor(worldPosF / static_cast<float>(chunkSize_v))};
+		auto const* chunk = getChunkAt(chunkPos);
+		if (!chunk) { return nullptr; }
+		auto tilePos = glm::ivec2{
+			((worldPosI.x % chunkSize_v) + chunkSize_v) % chunkSize_v,
+			((worldPosI.y % chunkSize_v) + chunkSize_v) % chunkSize_v,
+		};
+		return &chunk->tileAt(static_cast<std::size_t>(tilePos.x + (tilePos.y * chunkSize_v)));
+	};
+
+	for (auto z = terrainHeight_v; z >= 0; --z) {
+		auto worldZ = static_cast<float>(z) * tileSize_v;
+		auto const* tile = tileAtZ(worldZ);
+		if (!tile) { continue; }
+
+		if (tile->transform.position.z == worldZ) { return glm::ivec3{tile->transform.position}; }
+	}
+
+	return std::nullopt;
+}
+
 } // namespace resurgo

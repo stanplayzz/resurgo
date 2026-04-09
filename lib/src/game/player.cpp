@@ -48,8 +48,14 @@ void Player::draw(engine::Renderer& renderer) const { m_player.draw(renderer); }
 
 void Player::handleInput() {
 	m_moveDirection = {};
-	if (engine::Input::isKeyPressed(GLFW_KEY_W)) { m_moveDirection.y = 1; }
-	if (engine::Input::isKeyPressed(GLFW_KEY_S)) { m_moveDirection.y = -1; }
+	if (engine::Input::isKeyPressed(GLFW_KEY_W)) {
+		m_moveDirection.y = 1;
+		m_flipped = false;
+	}
+	if (engine::Input::isKeyPressed(GLFW_KEY_S)) {
+		m_moveDirection.y = -1;
+		m_flipped = true;
+	}
 	if (engine::Input::isKeyPressed(GLFW_KEY_A)) {
 		m_moveDirection.x = -1;
 		m_flipped = true;
@@ -58,7 +64,10 @@ void Player::handleInput() {
 		m_moveDirection.x = 1;
 		m_flipped = false;
 	}
-	if (glm::length(m_moveDirection) > 0.f) { m_moveDirection = glm::normalize(m_moveDirection); }
+	if (glm::length(m_moveDirection) > 0.f) {
+		m_moveDirection = glm::normalize(m_moveDirection);
+		setSprite(m_currentFrame, m_flipped);
+	}
 }
 
 void Player::animate(float deltaTime) {
