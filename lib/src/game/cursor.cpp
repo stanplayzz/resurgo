@@ -13,8 +13,7 @@ constexpr auto cursorAlphaMax_v = 1.0f;
 
 Cursor::Cursor(clib::not_null<ChunkManager const*> chunkManager) : m_chunkManager(chunkManager) {
 	m_cursor.transform.scale = {tileSize_v, tileSize_v, 1};
-	auto shader = engine::Resources::instance().loadShader("Outline", ASSETS_DIR "/shaders/default.vert",
-														   ASSETS_DIR "/shaders/outline.frag");
+	auto shader = engine::Resources::get().loadShader("Outline", "shaders/default.vert", "shaders/outline.frag");
 	m_cursor.material = engine::Material{shader};
 	m_cursor.material.setFloat("u_OutlineThickness", cursorThickness_v);
 	m_cursor.material.setVec4("u_OutlineColor", cursorColor_v.toVec4());

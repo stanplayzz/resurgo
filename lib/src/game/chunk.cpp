@@ -33,8 +33,8 @@ void Chunk::init(std::uint32_t seed) {
 		}
 	}
 
-	m_material = engine::Material{engine::Resources::instance().getShader("TerrainShader")};
-	m_material.setTexture(engine::Resources::instance().loadTexture(ASSETS_DIR "/images/test.png"));
+	m_material = engine::Material{engine::Resources::get().getShader("TerrainShader")};
+	m_material.setTexture(engine::Resources::get().loadTexture("images/test.png"));
 	m_material.setFloat("u_PixelSize", tileSize_v / pixelsPerTile_v);
 	m_material.setFloat("u_Scale", 0.02f);
 	m_material.setVec4("u_Color", terrainColor_v.toVec4());

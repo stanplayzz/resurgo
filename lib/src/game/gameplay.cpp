@@ -8,6 +8,9 @@ Gameplay::Gameplay() {
 	m_camera.transform.rotation = dimetricView_v;
 	m_camera.updateSize({1280, 720});
 	m_camera.transform.position.z = 700.f;
+
+	// preload
+	engine::Resources::get().loadShader("TerrainShader", "shaders/terrain.vert", "shaders/terrain.frag");
 }
 
 auto Gameplay::update(float deltaTime) -> std::unique_ptr<State> {

@@ -40,11 +40,6 @@ void App::run() {
 
 	m_stateManager.switchState(std::make_unique<Entrypoint>());
 
-	auto font = engine::Resources::instance().loadFont(ASSETS_DIR "/fonts/roboto.ttf");
-	auto text = engine::Text{*font.get()};
-	text.setString("Hello World");
-	text.setPosition({50, 300});
-
 	while (!glfwWindowShouldClose(m_window)) {
 		auto currentTime = static_cast<float>(glfwGetTime());
 		auto deltaTime = currentTime - lastTime;
@@ -57,7 +52,6 @@ void App::run() {
 		m_renderer.clear(Color::Black);
 		m_renderer.begin();
 
-		// m_renderer.draw(text);
 		m_stateManager.draw(m_renderer);
 
 		m_renderer.end();
@@ -67,11 +61,7 @@ void App::run() {
 
 // NOLINTNEXTLINE(readability-convert-member-functions-to-static)
 void App::preloadResources() {
-	engine::Resources::instance().loadShader("DepthShader", ASSETS_DIR "/shaders/depth_shader.vert",
-											 ASSETS_DIR "/shaders/depth_shader.frag");
-	engine::Resources::instance().loadShader("TerrainShader", ASSETS_DIR "/shaders/terrain.vert",
-											 ASSETS_DIR "/shaders/terrain.frag");
-	engine::Resources::instance().loadFont(ASSETS_DIR "/fonts/roboto.ttf");
-	engine::Resources::instance().loadFont(ASSETS_DIR "/fonts/audiowide.ttf");
+	engine::Resources::get().loadFont("fonts/roboto.ttf");
+	engine::Resources::get().loadFont("fonts/audiowide.ttf");
 }
 } // namespace resurgo

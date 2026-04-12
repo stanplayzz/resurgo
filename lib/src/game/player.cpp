@@ -8,14 +8,14 @@ namespace {
 constexpr auto playerTextureSize_v = glm::ivec2{31, 56};
 constexpr auto playerScale_v = 4;
 constexpr auto playerSpeed_v = 200.f;
-constexpr auto animSpeed_v = 0.3f; // seconds per frame
+constexpr auto animSpeed_v = 0.2f; // seconds per frame
 } // namespace
 Player::Player() {
 	m_player.transform.scale = {playerTextureSize_v * playerScale_v, 1};
 	m_player.transform.rotation = glm::eulerAngles(glm::quat(dimetricView_v));
 	m_player.material.setColor(Color::Red);
 
-	auto texture = engine::Resources::instance().loadTexture(ASSETS_DIR "/images/player.png");
+	auto texture = engine::Resources::get().loadTexture("images/player.png");
 	m_player.material.setTexture(texture);
 	m_player.material.setTextureRect({.size = playerTextureSize_v});
 }

@@ -9,7 +9,7 @@
 namespace resurgo::engine {
 class Material {
   public:
-	explicit Material(std::shared_ptr<Shader> shader = Resources::instance().getDefaultShader())
+	explicit Material(std::shared_ptr<Shader> shader = Resources::get().getDefaultShader())
 		: m_shader(std::move(shader)) {}
 
 	void setColor(Color const& color) { m_color = color; }

@@ -6,7 +6,7 @@
 namespace resurgo::shape {
 class Cube : public engine::GameObject {
   public:
-	Cube(std::shared_ptr<engine::Shader> shader = engine::Resources::instance().getDefaultShader())
+	Cube(std::shared_ptr<engine::Shader> shader = engine::Resources::get().getDefaultShader())
 		: engine::GameObject(createGeometry(), std::move(shader)) {}
 
   private:

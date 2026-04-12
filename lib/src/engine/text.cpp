@@ -15,9 +15,7 @@ Text::Text(Font& font) : m_font(font), m_vao(createVertexArray()), m_vbo(createB
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
 
-	m_shader = Resources::instance()
-				   .loadShader("TextShader", ASSETS_DIR "/shaders/text.vert", ASSETS_DIR "/shaders/text.frag")
-				   .get();
+	m_shader = Resources::get().loadShader("TextShader", "shaders/text.vert", "shaders/text.frag").get();
 }
 
 void Text::setCharacterSize(unsigned int charSize) { m_charSize = charSize; }

@@ -4,8 +4,8 @@
 
 namespace resurgo {
 Entrypoint::Entrypoint()
-	: m_title(*engine::Resources::instance().getFont(ASSETS_DIR "/fonts/audiowide.ttf")),
-	  m_playButton(*engine::Resources::instance().getFont(ASSETS_DIR "/fonts/audiowide.ttf")) {
+	: m_title(*engine::Resources::get().getFont("fonts/audiowide.ttf")),
+	  m_playButton(*engine::Resources::get().getFont("fonts/audiowide.ttf")) {
 	m_camera.updateSize({1280, 720});
 	m_camera.nearPlane = 0;
 
@@ -19,12 +19,11 @@ Entrypoint::Entrypoint()
 
 	m_background.transform.scale = {m_camera.getSize(), 1};
 	m_background.transform.position = {0, 0, -100};
-	m_background.material.setTexture(
-		engine::Resources::instance().loadTexture(ASSETS_DIR "/images/entrypoint_background.png"));
+	m_background.material.setTexture(engine::Resources::get().loadTexture("images/entrypoint_background.png"));
 
 	m_planet.transform.scale = {m_camera.getSize().y, m_camera.getSize().y, 1};
 	m_planet.transform.position = {0, -m_camera.getSize().y * 0.5f, 0};
-	m_planet.material.setTexture(engine::Resources::instance().loadTexture(ASSETS_DIR "/images/entrypoint_planet.png"));
+	m_planet.material.setTexture(engine::Resources::get().loadTexture("images/entrypoint_planet.png"));
 }
 
 auto Entrypoint::update(float deltaTime) -> std::unique_ptr<State> {

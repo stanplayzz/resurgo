@@ -6,7 +6,7 @@
 namespace resurgo::shape {
 class Quad : public engine::GameObject {
   public:
-	Quad(std::shared_ptr<engine::Shader> shader = engine::Resources::instance().getDefaultShader())
+	Quad(std::shared_ptr<engine::Shader> shader = engine::Resources::get().getDefaultShader())
 		: engine::GameObject(createQuadGeometry(), std::move(shader)) {}
 
   private:

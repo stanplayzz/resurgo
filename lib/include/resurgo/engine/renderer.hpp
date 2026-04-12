@@ -2,7 +2,6 @@
 #include "resurgo/engine/camera.hpp"
 #include "resurgo/engine/geometry.hpp"
 #include "resurgo/engine/material.hpp"
-#include "resurgo/engine/shadow_map.hpp"
 #include "resurgo/engine/text.hpp"
 #include "resurgo/utils/color.hpp"
 #include <GL/gl.h>
@@ -16,7 +15,7 @@ class Renderer {
 	void begin();
 	void draw(IGeometry const* geometry, Material const* material, Transform transform);
 	void draw(Text const& text);
-	void end(ShadowMap const* shadowMap = nullptr);
+	void end();
 
 	void setCamera(Camera const& camera);
 
@@ -27,7 +26,7 @@ class Renderer {
 	}
 
   private:
-	void mainPass(ShadowMap const* shadowMap);
+	void mainPass();
 	void textPass();
 
 	struct RenderCommand {
