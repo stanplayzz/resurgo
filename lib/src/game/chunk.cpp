@@ -5,6 +5,7 @@ namespace resurgo {
 namespace {
 constexpr auto noiseScale_v = 0.07f;
 constexpr auto heightColorFactor_v = 0.1f;
+constexpr auto terrainColor_v = Color{.r = 139.f / 255.f, .g = 99.f / 255.f, .b = 71 / 255.f};
 
 constexpr auto getColorFromHeight(float z) -> Color {
 	auto c = 1.f - ((terrainHeight_v - z) * heightColorFactor_v);
@@ -33,7 +34,10 @@ void Chunk::init(std::uint32_t seed) {
 	}
 
 	m_material = engine::Material{engine::Resources::instance().getShader("TerrainShader")};
-	m_material.setTexture(engine::Resources::instance().loadTexture(ASSETS_DIR "/images/tileset.png"));
+	m_material.setTexture(engine::Resources::instance().loadTexture(ASSETS_DIR "/images/test.png"));
+	m_material.setFloat("u_PixelSize", tileSize_v / pixelsPerTile_v);
+	m_material.setFloat("u_Scale", 0.02f);
+	m_material.setVec4("u_Color", terrainColor_v.toVec4());
 }
 
 void Chunk::generate(Chunk const* rightChunk, Chunk const* frontChunk) {

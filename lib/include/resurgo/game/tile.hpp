@@ -4,6 +4,7 @@
 
 namespace resurgo {
 constexpr auto tileSize_v = 64;
+constexpr auto pixelsPerTile_v = 8;
 
 struct Tile {
 	engine::Transform transform{};
